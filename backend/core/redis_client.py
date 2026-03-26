@@ -35,9 +35,19 @@ class RedisClient:
 
     # ── Event Stream Helpers ──────────────────────────────────────────────────
 
-    async def publish(self, stream: str, data: dict[str, Any]) -> str:
+    async publish(self, stream: str, data: dict[str, Any]) -> str:
         """Publish an event to a Redis stream (XADD). Returns the event ID."""
-        payload = {k: json.dumps(v) if not isinstance(v, str) else v for k, v in data.items()}
+        payload: dict[str, str] = {}
+        for k, v in data.items():
+            if isinstance(v, str):
+                payload[k] = v
+            else:
+                try:
+                    payload[k] = json.dumps(v)
+                except (TypeError, ValueError) as exc:
+                    raise ValueError(
+                        f"Field '{k}' in stream '{stream}' is not JSON-serialisable: {exc!r}"
+                    ) from exc
         return await self.client.xadd(stream, payload)
 
     async def consume(

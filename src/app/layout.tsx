@@ -9,7 +9,15 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "LeadIQ — AI Lead Intelligence Platform",
-  description: "AI-powered lead intelligence, scoring, and outreach platform",
+  description:
+    "AI-powered lead intelligence, scoring, and outreach platform. Automatically detect demand signals, score leads, and generate personalized outreach.",
+  keywords: ["lead generation", "AI", "sales intelligence", "outreach", "CRM"],
+  authors: [{ name: "LeadIQ" }],
+  openGraph: {
+    title: "LeadIQ — AI Lead Intelligence Platform",
+    description: "AI-powered lead intelligence, scoring, and outreach platform.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
