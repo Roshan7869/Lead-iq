@@ -1,13 +1,22 @@
 "use client";
 
+import dynamic from 'next/dynamic';
 import { DashboardLayout } from '@/components/DashboardLayout';
-import { EnhancedLeadCard } from '@/components/enhanced/enhanced-lead-card';
-import { LeadDetailModal } from '@/components/LeadDetailModal';
 import { useLeads } from '@/hooks/use-leads';
 import { SOURCE_CONFIG, LeadSource } from '@/types/lead';
 import { Text } from '@/components/ui/text';
 import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
+
+const EnhancedLeadCard = dynamic(
+  () => import('@/components/enhanced/enhanced-lead-card').then((m) => ({ default: m.EnhancedLeadCard })),
+  { ssr: false, loading: () => <div className="h-32 glass-panel animate-pulse rounded-xl" /> }
+);
+
+const LeadDetailModal = dynamic(
+  () => import('@/components/LeadDetailModal').then((m) => ({ default: m.LeadDetailModal })),
+  { ssr: false }
+);
 
 const SOURCES: LeadSource[] = ['reddit', 'linkedin', 'x', 'yc', 'indie_hackers'];
 

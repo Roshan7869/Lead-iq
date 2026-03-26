@@ -1,12 +1,25 @@
 "use client";
 
-import { EnhancedStatsCards } from '@/components/enhanced/enhanced-stats-cards';
-import { EnhancedLeadCard } from '@/components/enhanced/enhanced-lead-card';
-import { LeadDetailModal } from '@/components/LeadDetailModal';
+import dynamic from 'next/dynamic';
 import { useLeads } from '@/hooks/use-leads';
 import { STAGE_CONFIG, LeadStage } from '@/types/lead';
 import { DashboardLayout } from '@/components/DashboardLayout';
 import { Text } from '@/components/ui/text';
+
+const EnhancedStatsCards = dynamic(
+  () => import('@/components/enhanced/enhanced-stats-cards').then((m) => ({ default: m.EnhancedStatsCards })),
+  { ssr: false, loading: () => <div className="grid grid-cols-2 md:grid-cols-3 gap-4">{Array.from({ length: 6 }).map((_, i) => <div key={i} className="h-24 glass-panel animate-pulse rounded-xl" />)}</div> }
+);
+
+const EnhancedLeadCard = dynamic(
+  () => import('@/components/enhanced/enhanced-lead-card').then((m) => ({ default: m.EnhancedLeadCard })),
+  { ssr: false, loading: () => <div className="h-32 glass-panel animate-pulse rounded-xl" /> }
+);
+
+const LeadDetailModal = dynamic(
+  () => import('@/components/LeadDetailModal').then((m) => ({ default: m.LeadDetailModal })),
+  { ssr: false }
+);
 
 const STAGES: LeadStage[] = ['detected', 'qualified', 'contacted', 'meeting', 'closed'];
 

@@ -1,12 +1,20 @@
 "use client";
 
+import dynamic from 'next/dynamic';
 import { DashboardLayout } from '@/components/DashboardLayout';
-import { EnhancedPipelineBoard } from '@/components/enhanced/enhanced-pipeline-board';
-import { LeadDetailModal } from '@/components/LeadDetailModal';
 import { Text } from '@/components/ui/text';
 
-export default function PipelinePage() {
+const EnhancedPipelineBoard = dynamic(
+  () => import('@/components/enhanced/enhanced-pipeline-board').then((m) => ({ default: m.EnhancedPipelineBoard })),
+  { ssr: false, loading: () => <div className="h-64 glass-panel animate-pulse" /> }
+);
 
+const LeadDetailModal = dynamic(
+  () => import('@/components/LeadDetailModal').then((m) => ({ default: m.LeadDetailModal })),
+  { ssr: false }
+);
+
+export default function PipelinePage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">

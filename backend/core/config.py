@@ -22,7 +22,17 @@ class Settings(BaseSettings):
     # CORS
     ALLOWED_ORIGINS: list[str] = ["http://localhost:3000"]
 
-    # Redis Stream names
+    # ── Gemini / GCP ─────────────────────────────────────────────────────────
+    # Option 1 (recommended for GCP): Vertex AI — set project + location only,
+    #   authenticate via Application Default Credentials (GOOGLE_APPLICATION_CREDENTIALS)
+    GCP_PROJECT_ID: str = ""
+    GCP_LOCATION: str = "us-central1"
+    # Option 2 (simpler): direct Gemini API key from Google AI Studio
+    GEMINI_API_KEY: str = ""
+    # Model to use (gemini-2.0-flash is cheapest/fastest, gemini-1.5-pro for quality)
+    GEMINI_MODEL: str = "gemini-2.0-flash"
+
+    # ── Redis Stream names ────────────────────────────────────────────────────
     STREAM_COLLECTED: str = "lead:collected"
     STREAM_ANALYZED: str = "lead:analyzed"
     STREAM_SCORED: str = "lead:scored"
