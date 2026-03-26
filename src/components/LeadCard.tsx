@@ -1,3 +1,5 @@
+"use client";
+
 import { Lead, PRIORITY_ICON, SOURCE_CONFIG } from '@/types/lead';
 import { useLeads } from '@/hooks/use-leads';
 

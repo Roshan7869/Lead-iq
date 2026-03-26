@@ -1,3 +1,5 @@
+"use client";
+
 import { DashboardLayout } from '@/components/DashboardLayout';
 import { useLeads } from '@/hooks/use-leads';
 import { STAGE_CONFIG, LeadStage } from '@/types/lead';

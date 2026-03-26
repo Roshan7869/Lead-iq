@@ -1,3 +1,5 @@
+"use client";
+
 import { useLeads } from '@/hooks/use-leads';
 import { STAGE_CONFIG, SOURCE_CONFIG, PRIORITY_ICON } from '@/types/lead';
 import {

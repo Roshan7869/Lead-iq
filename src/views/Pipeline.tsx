@@ -1,3 +1,5 @@
+"use client";
+
 import { DashboardLayout } from '@/components/DashboardLayout';
 import { EnhancedPipelineBoard } from '@/components/enhanced/enhanced-pipeline-board';
 import { LeadDetailModal } from '@/components/LeadDetailModal';

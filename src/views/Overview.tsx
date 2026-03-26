@@ -1,3 +1,5 @@
+"use client";
+
 import { EnhancedStatsCards } from '@/components/enhanced/enhanced-stats-cards';
 import { EnhancedLeadCard } from '@/components/enhanced/enhanced-lead-card';
 import { LeadDetailModal } from '@/components/LeadDetailModal';

@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, createContext, useContext, ReactNode } from 'react';
 import { Lead } from '@/types/lead';
 import { demoLeads } from '@/data/demo-leads';

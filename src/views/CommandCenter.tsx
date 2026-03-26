@@ -1,3 +1,5 @@
+"use client";
+
 import { DashboardLayout } from '@/components/DashboardLayout';
 import { EnhancedCommandCenter } from '@/components/enhanced/enhanced-command-center';
 import { Text } from '@/components/ui/text';

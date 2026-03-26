@@ -1,12 +1,12 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Text } from "@/components/ui/text";
-import { Video as LucideIcon } from "lucide-react";
+import type { LucideProps } from "lucide-react";
 
 interface MetricCardProps extends React.HTMLAttributes<HTMLDivElement> {
   label: string;
   value: string | number;
-  icon?: LucideIcon;
+  icon?: React.ComponentType<LucideProps>;
   trend?: {
     value: number;
     isPositive: boolean;

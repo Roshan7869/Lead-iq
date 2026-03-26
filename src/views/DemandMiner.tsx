@@ -1,3 +1,5 @@
+"use client";
+
 import { DashboardLayout } from '@/components/DashboardLayout';
 import { EnhancedLeadCard } from '@/components/enhanced/enhanced-lead-card';
 import { LeadDetailModal } from '@/components/LeadDetailModal';

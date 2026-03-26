@@ -1,5 +1,7 @@
-import { NavLink } from '@/components/NavLink';
-import { useLocation } from 'react-router-dom';
+"use client";
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
   Kanban,
@@ -24,7 +26,7 @@ const navItems = [
 
 export function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
-  const location = useLocation();
+  const pathname = usePathname();
 
   return (
     <aside
@@ -47,21 +49,20 @@ export function AppSidebar() {
       {/* Nav */}
       <nav className="flex-1 py-4 space-y-1 px-2 overflow-y-auto custom-scrollbar">
         {navItems.map((item) => {
-          const isActive = location.pathname === item.url;
+          const isActive = pathname === item.url;
           return (
-            <NavLink
+            <Link
               key={item.url}
-              to={item.url}
-              end
+              href={item.url}
               className={cn(
                 'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
                 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+                isActive && 'bg-sidebar-accent text-primary glow-primary',
               )}
-              activeClassName="bg-sidebar-accent text-primary glow-primary"
             >
               <item.icon className="h-5 w-5 shrink-0" />
               {!collapsed && <span>{item.title}</span>}
-            </NavLink>
+            </Link>
           );
         })}
       </nav>

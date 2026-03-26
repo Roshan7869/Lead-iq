@@ -1,3 +1,5 @@
+"use client";
+
 import { useLeads } from '@/hooks/use-leads';
 import { Users, UserCheck, Send, Handshake, IndianRupee, TrendingUp } from 'lucide-react';
 
