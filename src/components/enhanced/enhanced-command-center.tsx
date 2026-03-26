@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useRef, useEffect } from 'react';
 import { useLeads } from '@/hooks/use-leads';
 import { STAGE_CONFIG, PRIORITY_ICON, LeadStage } from '@/types/lead';

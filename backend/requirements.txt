@@ -1,0 +1,14 @@
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+redis>=5.0.0
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+sqlalchemy>=2.0.0
+asyncpg>=0.29.0
+python-dotenv>=1.0.0
+
+# ── AI / LLM ──────────────────────────────────────────────────────────────────
+# Google Gemini via direct API key (Google AI Studio) OR via Vertex AI (GCP)
+google-generativeai>=0.8.0
+# For Vertex AI auth (GCP service account / Application Default Credentials)
+google-cloud-aiplatform>=1.60.0

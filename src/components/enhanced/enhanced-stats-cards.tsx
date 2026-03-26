@@ -1,3 +1,5 @@
+"use client";
+
 import { useLeads } from '@/hooks/use-leads';
 import { MetricCard } from '@/components/ui/metric-card';
 import { Users, UserCheck, Send, Handshake, IndianRupee, TrendingUp } from 'lucide-react';

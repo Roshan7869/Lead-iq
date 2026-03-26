@@ -1,3 +1,5 @@
+"use client";
+
 import { useLeads } from '@/hooks/use-leads';
 import { STAGE_CONFIG, LeadStage } from '@/types/lead';
 import { EnhancedLeadCard } from './enhanced-lead-card';
