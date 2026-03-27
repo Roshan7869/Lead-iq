@@ -9,7 +9,7 @@ import { NextRequest, NextResponse } from "next/server";
  *
  * Limits:
  *   - API routes (/api/*) — 60 requests / 60 s per IP
- *   - Run-miner / run-ai  — 10 requests / 60 s per IP (expensive operations)
+ *   - Run-miner / run-ai / run-pipeline — 10 requests / 60 s per IP (expensive operations)
  */
 
 const WINDOW_MS = 60_000; // 1 minute
@@ -57,7 +57,10 @@ export function middleware(request: NextRequest) {
   }
 
   const ip = getIp(request);
-  const isExpensive = pathname.startsWith("/api/run-miner") || pathname.startsWith("/api/run-ai");
+  const isExpensive =
+    pathname.startsWith("/api/run-miner") ||
+    pathname.startsWith("/api/run-ai") ||
+    pathname.startsWith("/api/run-pipeline");
   const limit = isExpensive ? EXPENSIVE_LIMIT : DEFAULT_LIMIT;
   const key = `${ip}:${isExpensive ? "expensive" : "default"}`;
 

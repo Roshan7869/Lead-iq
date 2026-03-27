@@ -55,6 +55,7 @@ export function EnhancedCommandCenter() {
       case '/help':
         addLines([
           { type: 'output', text: '🤖 AI-Powered Commands Available:' },
+          { type: 'output', text: '  /run-pipeline      — Run full AI pipeline (collect → analyse → score → CRM)' },
           { type: 'output', text: '  /analyze-leads     — AI analysis of all leads' },
           { type: 'output', text: '  /top-opportunities — AI-ranked hot prospects' },
           { type: 'output', text: '  /generate-pitch    — AI pitch generation' },
@@ -65,6 +66,33 @@ export function EnhancedCommandCenter() {
           { type: 'output', text: '  /clear             — Clear terminal' },
         ]);
         break;
+
+      case '/run-pipeline': {
+        setIsProcessing(true);
+        addLines([
+          { type: 'system', text: '🚀 LAUNCHING FULL AI PIPELINE' },
+          { type: 'output', text: '  [1/6] 🔍 Collecting demand signals...' },
+        ]);
+        try {
+          const res = await fetch('/api/run-pipeline', { method: 'POST' });
+          const data = await res.json();
+          const s = data.summary ?? {};
+          setIsProcessing(false);
+          addLines([
+            { type: 'output', text: `  [2/6] 🧠 AI analysis complete (${s.analyzed ?? '?'} events)` },
+            { type: 'output', text: `  [3/6] 📊 Scoring complete (${s.scored ?? '?'} events)` },
+            { type: 'output', text: `  [4/6] 🏆 Ranking complete (${s.ranked ?? '?'} events)` },
+            { type: 'output', text: `  [5/6] ✉️  Outreach generated (${s.outreach ?? '?'} messages)` },
+            { type: 'success', text: `  [6/6] ✅ CRM updated — ${s.crm_updated ?? '?'} new leads` },
+            { type: 'system', text: '' },
+            { type: 'success', text: `🎉 Pipeline complete! Collected ${s.collected ?? '?'} signals → ${s.crm_updated ?? '?'} CRM leads` },
+          ]);
+        } catch {
+          setIsProcessing(false);
+          addLines([{ type: 'error', text: '❌ Pipeline failed — check backend connection' }]);
+        }
+        break;
+      }
 
       case '/analyze-leads':
         await simulateAIProcessing(command);

@@ -1,6 +1,6 @@
 # 🔍 LeadIQ — Project Audit & Market-Readiness Checkpoints
 
-> Last audited: 2026-03-26  
+> Last audited: 2026-03-27  
 > Stack: Next.js 15.3.9 App Router + FastAPI backend + Redis + PostgreSQL
 
 ---
@@ -45,6 +45,13 @@
 | 13 | `README.md` was placeholder | 🟢 Low | ✅ Fixed — full documentation written |
 | 14 | `next.config.ts` empty — no React strict mode, no compression, no image formats | 🟡 Medium | ✅ Fixed |
 | 15 | `postcss.config.js` named `.js` but project is now `"type": "module"` | 🟡 Medium | ✅ Fixed — renamed to `.cjs` |
+| 16 | **No real LLM** — AI analyzer used heuristics only | 🟡 Medium | ✅ Fixed — Gemini (Google Generative AI) integrated in `backend/workers/analyzer/worker.py`; falls back to heuristics when no API key is set |
+| 17 | **No full pipeline** — collector and analyzer were disconnected one-shot endpoints | 🟡 Medium | ✅ Fixed — `backend/workers/pipeline.py` chains all 6 stages (collect → analyse → score → rank → outreach → CRM write) with high-water mark tracking |
+| 18 | **Frontend API routes returned only demo data** — `GET /api/leads`, `POST /api/run-miner`, `POST /api/run-ai` didn't proxy to FastAPI | 🟡 Medium | ✅ Fixed — all three routes now proxy to `NEXT_PUBLIC_API_URL` with graceful demo-data fallback |
+| 19 | **No `/api/run-pipeline` endpoint** | 🟡 Medium | ✅ Fixed — added to both FastAPI backend and Next.js API layer with Zod validation |
+| 20 | **No rate limiting on `/api/run-pipeline`** | 🟡 Medium | ✅ Fixed — included in expensive rate-limit group (10 req/60 s per IP) in middleware |
+| 21 | **`vite.config.ts` imported uninstalled `lovable-tagger`** — caused potential build errors | 🟢 Low | ✅ Fixed — removed import |
+| 22 | **Command Center `/run-pipeline` command** not wired to real API | 🟡 Medium | ✅ Fixed — terminal command now calls `/api/run-pipeline` and shows live stage-by-stage results |
 
 ---
 
@@ -52,19 +59,11 @@
 
 | # | Issue | Severity | Action Required |
 |---|-------|----------|-----------------|
-| 1 | **First Load JS too large** — `/`, `/pipeline`, `/demand-miner` all load ~317 KB (target: < 200 KB) | 🟡 Medium | Implement dynamic imports for heavy components (`recharts`, `radix-ui`) |
-| 2 | **Frontend data is demo-only** — `use-leads` hook never fetches from `/api/leads` | 🟡 Medium | Wire `LeadProvider` to fetch from `NEXT_PUBLIC_API_URL/api/leads` |
-| 3 | **No authentication** — any user can access all leads and actions | 🔴 Critical (production) | Implement NextAuth.js or Clerk |
-| 4 | **CRM service is in-memory** — `backend/services/crm_service.py` uses a dict, not PostgreSQL | 🟡 Medium | Implement SQLAlchemy session with `asyncpg` |
-| 5 | **No real LLM** — AI analyzer uses heuristics, not an actual LLM API | 🟡 Medium | Integrate OpenAI / Anthropic API |
-| 6 | **`vite.config.ts` still in repo** — orphaned (only vitest uses it), causes confusion | 🟢 Low | Move vitest config to standalone or remove vite dep entirely |
-| 7 | **Mixed lockfiles** — both `bun.lock`, `bun.lockb`, and `package-lock.json` | 🟢 Low | Remove bun lockfiles, standardize on npm |
-| 8 | **Duplicate `src/index.css`** — no longer imported anywhere | 🟢 Low | Delete file |
-| 9 | **Duplicate `src/styles/tokens.css`** — no longer imported anywhere | 🟢 Low | Delete file |
-| 10 | **No rate limiting** on API routes | 🔴 Critical (production) | Add middleware rate limiting |
-| 11 | **No input validation** on PATCH `/api/lead/[id]` | 🟡 Medium | Add Zod schema validation |
-| 12 | **`npm audit` vulnerabilities** — 15 known (3 low, 7 moderate, 5 high) in dev deps | 🟡 Medium | Most are in `jsdom`/`vite`/`esbuild` (devDependencies); run `npm audit fix` |
-| 13 | **ESLint Next.js plugin** not detected in flat config | 🟢 Low | eslint-config-next doesn't yet support flat config; monitor for upstream fix |
+| 1 | **First Load JS too large** — `/`, `/pipeline`, `/demand-miner` all load ~147 KB (target: < 200 KB ✅ improved) | 🟢 Low | Dynamic imports already added; monitor for regression |
+| 2 | **No authentication** — any user can access all leads and actions | 🔴 Critical (production) | Implement NextAuth.js or Clerk |
+| 3 | **CRM service is in-memory** — `backend/services/crm_service.py` uses a dict, not PostgreSQL | 🟡 Medium | Implement SQLAlchemy session with `asyncpg` |
+| 4 | **`npm audit` vulnerabilities** — known issues in dev deps (`jsdom`/`vite`/`esbuild`) | 🟡 Medium | Run `npm audit fix` to auto-fix patchable vulnerabilities |
+| 5 | **ESLint Next.js plugin** not detected in flat config | 🟢 Low | eslint-config-next doesn't yet support flat config; monitor for upstream fix |
 
 ---
 
