@@ -1,1 +1,0 @@
-"""Analyzer worker package"""

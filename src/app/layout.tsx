@@ -3,6 +3,10 @@ import { QueryClientProviderWrapper } from "@/components/query-client-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LeadProvider } from "@/hooks/use-leads";
+import { ProfileProvider } from "@/hooks/use-profile";
+import { AuthProvider } from "@/hooks/use-auth";
+import { AppShell } from "@/components/AppShell";
+import { WebMCPProvider } from "@/components/WebMCPProvider";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
@@ -31,11 +35,19 @@ export default function RootLayout({
         <QueryClientProviderWrapper>
           <ThemeProvider defaultTheme="dark" storageKey="leadiq-theme">
             <TooltipProvider>
-              <LeadProvider>
-                <Toaster />
-                <Sonner />
-                {children}
-              </LeadProvider>
+              <AuthProvider>
+                <ProfileProvider>
+                  <LeadProvider>
+                    <WebMCPProvider>
+                      <AppShell>
+                        {children}
+                      </AppShell>
+                    </WebMCPProvider>
+                    <Toaster />
+                    <Sonner />
+                  </LeadProvider>
+                </ProfileProvider>
+              </AuthProvider>
             </TooltipProvider>
           </ThemeProvider>
         </QueryClientProviderWrapper>
@@ -43,3 +55,4 @@ export default function RootLayout({
     </html>
   );
 }
+

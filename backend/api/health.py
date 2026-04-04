@@ -1,18 +1,20 @@
-"""
-Health check API — Phase 1
+"""Health check API.
 GET /api/health
 """
+from __future__ import annotations
 
-from fastapi import APIRouter
 from datetime import datetime, timezone
 
-router = APIRouter()
+from fastapi import APIRouter
+
+router = APIRouter(prefix="/api", tags=["health"])
 
 
 @router.get("/health")
-async def health_check():
+async def health_check() -> dict:
     return {
         "status": "ok",
-        "service": "LeadIQ Backend",
+        "service": "LeadIQ API",
         "timestamp": datetime.now(timezone.utc).isoformat(),
+        "version": "2.0.0",
     }

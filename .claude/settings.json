@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git:*)",
+      "Bash(pytest:*)",
+      "Bash(alembic:*)",
+      "Bash(python eval/run_eval.py)",
+      "Bash(uvicorn:*)",
+      "Bash(celery:*)",
+      "Bash(pip:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)"
+    ],
+    "deny": [
+      "Bash(alembic upgrade head)",
+      "Bash(rm -rf:*)",
+      "Bash(DROP TABLE:*)"
+    ]
+  },
+  "autoApprove": false,
+  "contextWindow": "auto"
+}

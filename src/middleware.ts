@@ -1,20 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
 
 /**
- * Simple in-process rate limiter for Next.js API routes.
+ * Next.js middleware — two responsibilities:
  *
- * Uses a sliding window counter stored in a Map (resets on server restart).
- * For multi-instance deployments, replace with an Upstash Redis rate limiter
- * (e.g. @upstash/ratelimit).
+ * 1. AUTH GATE: Pages (non /login, non /api/auth/*) require a "leadiq_session"
+ *    cookie that gets set by auth-client.ts on successful login.  The real JWT
+ *    validation happens on the FastAPI backend; the cookie is just a lightweight
+ *    client-side signal so the middleware doesn't need to verify crypto.
+ *
+ * 2. RATE LIMITING: API routes are limited via sliding window counters stored
+ *    in a Map (resets on server restart).  For multi-instance deployments,
+ *    replace with @upstash/ratelimit.
  *
  * Limits:
- *   - API routes (/api/*) — 60 requests / 60 s per IP
- *   - Run-miner / run-ai  — 10 requests / 60 s per IP (expensive operations)
+ *   - API routes (/api/*)               — 60 req / 60 s per IP
+ *   - run-miner / run-ai  (expensive)   — 10 req / 60 s per IP
  */
 
-const WINDOW_MS = 60_000; // 1 minute
-const DEFAULT_LIMIT = 60;
+const WINDOW_MS       = 60_000;
+const DEFAULT_LIMIT   = 60;
 const EXPENSIVE_LIMIT = 10;
+
+const SESSION_COOKIE = "leadiq_session";
+
+// Public paths that never need auth
+const PUBLIC_PATHS = ["/login", "/api/auth"];
 
 interface RateLimitEntry {
   count: number;
@@ -31,8 +41,11 @@ function getIp(request: NextRequest): string {
   );
 }
 
-function checkRateLimit(key: string, limit: number): { allowed: boolean; remaining: number; resetAt: number } {
-  const now = Date.now();
+function checkRateLimit(
+  key: string,
+  limit: number,
+): { allowed: boolean; remaining: number; resetAt: number } {
+  const now   = Date.now();
   const entry = store.get(key);
 
   if (!entry || now > entry.resetAt) {
@@ -51,36 +64,50 @@ function checkRateLimit(key: string, limit: number): { allowed: boolean; remaini
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Only rate-limit API routes
-  if (!pathname.startsWith("/api/")) {
-    return NextResponse.next();
+  // ── Auth gate (page routes only) ──────────────────────────────────────────
+  const isPublicPath = PUBLIC_PATHS.some((p) => pathname.startsWith(p));
+  const isApiRoute   = pathname.startsWith("/api/");
+
+  if (!isPublicPath && !isApiRoute) {
+    // Page request — check session cookie
+    const session = request.cookies.get(SESSION_COOKIE);
+    if (!session?.value) {
+      const loginUrl = new URL("/login", request.url);
+      return NextResponse.redirect(loginUrl);
+    }
   }
 
-  const ip = getIp(request);
-  const isExpensive = pathname.startsWith("/api/run-miner") || pathname.startsWith("/api/run-ai");
-  const limit = isExpensive ? EXPENSIVE_LIMIT : DEFAULT_LIMIT;
-  const key = `${ip}:${isExpensive ? "expensive" : "default"}`;
+  // ── Rate limiting (API routes only) ──────────────────────────────────────
+  if (isApiRoute) {
+    const ip          = getIp(request);
+    const isExpensive = pathname.startsWith("/api/run-miner") || pathname.startsWith("/api/run-ai");
+    const limit       = isExpensive ? EXPENSIVE_LIMIT : DEFAULT_LIMIT;
+    const key         = `${ip}:${isExpensive ? "expensive" : "default"}`;
 
-  const { allowed, remaining, resetAt } = checkRateLimit(key, limit);
+    const { allowed, remaining, resetAt } = checkRateLimit(key, limit);
 
-  const headers = {
-    "X-RateLimit-Limit": String(limit),
-    "X-RateLimit-Remaining": String(remaining),
-    "X-RateLimit-Reset": String(Math.ceil(resetAt / 1000)),
-  };
+    const rlHeaders = {
+      "X-RateLimit-Limit":     String(limit),
+      "X-RateLimit-Remaining": String(remaining),
+      "X-RateLimit-Reset":     String(Math.ceil(resetAt / 1000)),
+    };
 
-  if (!allowed) {
-    return NextResponse.json(
-      { error: "Too many requests. Please try again later." },
-      { status: 429, headers }
-    );
+    if (!allowed) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { status: 429, headers: rlHeaders },
+      );
+    }
+
+    const response = NextResponse.next();
+    Object.entries(rlHeaders).forEach(([k, v]) => response.headers.set(k, v));
+    return response;
   }
 
-  const response = NextResponse.next();
-  Object.entries(headers).forEach(([k, v]) => response.headers.set(k, v));
-  return response;
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: "/api/:path*",
+  // Run middleware on all paths except static assets
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|robots.txt).*)"],
 };

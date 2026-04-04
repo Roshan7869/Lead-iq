@@ -1,0 +1,40 @@
+name: ci
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install frontend dependencies
+        run: npm ci
+      - name: Run frontend tests
+        run: npm test -- --runInBand
+      - name: Build Next.js app
+        run: npm run build
+
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+      - name: Sync backend dev dependencies
+        run: uv sync --project backend --extra dev
+      - name: Run backend unit tests
+        run: uv run --project backend pytest backend/tests -q -m 'not integration'
+      - name: Run backend integration tests
+        env:
+          RUN_INTEGRATION_TESTS: '1'
+        run: uv run --project backend pytest backend/tests -q -m integration

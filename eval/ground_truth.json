@@ -1,0 +1,802 @@
+[
+  {
+    "id": "gt_001",
+    "source": "tracxn",
+    "input_url": "https://tracxn.com/explore/saas-startups-in-india",
+    "expected": {
+      "company_name": "TestStartup Pvt Ltd",
+      "industry": "SaaS",
+      "location": "Bangalore, India",
+      "company_size": "11-50",
+      "funding_stage": "seed",
+      "tech_stack": ["React", "Node.js"],
+      "email": null,
+      "confidence_min": 0.60
+    },
+    "notes": "Seed stage SaaS — funding should be present, email rarely on Tracxn"
+  },
+  {
+    "id": "gt_002",
+    "source": "tracxn",
+    "input_url": "https://tracxn.com/explore/saas-startups-in-india",
+    "expected": {
+      "company_name": "CloudScale Technologies",
+      "industry": "Cloud Infrastructure",
+      "location": "Hyderabad, India",
+      "company_size": "51-100",
+      "funding_stage": "series_a",
+      "tech_stack": ["Kubernetes", "Terraform", "AWS"],
+      "email": null,
+      "confidence_min": 0.55
+    },
+    "notes": "Series A cloud startup — company size and funding stage should be present"
+  },
+  {
+    "id": "gt_003",
+    "source": "tracxn",
+    "input_url": "https://tracxn.com/explore/saas-startups-in-india",
+    "expected": {
+      "company_name": "DataFlow AI",
+      "industry": "AI/ML",
+      "location": "Pune, India",
+      "company_size": "11-50",
+      "funding_stage": "pre_seed",
+      "tech_stack": ["Python", "PyTorch", "FastAPI"],
+      "email": null,
+      "confidence_min": 0.50
+    },
+    "notes": "Pre-seed AI startup — smaller team, minimal funding data"
+  },
+  {
+    "id": "gt_004",
+    "source": "tracxn",
+    "input_url": "https://tracxn.com/explore/saas-startups-in-india",
+    "expected": {
+      "company_name": "FinGuard Systems",
+      "industry": "Fintech",
+      "location": "Mumbai, India",
+      "company_size": "101-200",
+      "funding_stage": "series_b",
+      "tech_stack": ["Go", "PostgreSQL", "Redis"],
+      "email": null,
+      "confidence_min": 0.65
+    },
+    "notes": "Series B fintech — larger company, more established funding"
+  },
+  {
+    "id": "gt_005",
+    "source": "tracxn",
+    "input_url": "https://tracxn.com/explore/saas-startups-in-india",
+    "expected": {
+      "company_name": "HealthPlus Tech",
+      "industry": "Healthcare IT",
+      "location": "Delhi NCR, India",
+      "company_size": "51-100",
+      "funding_stage": "seed",
+      "tech_stack": ["Vue.js", "Django", "AWS"],
+      "email": null,
+      "confidence_min": 0.55
+    },
+    "notes": "Healthcare SaaS — may have less public data"
+  },
+  {
+    "id": "gt_006",
+    "source": "tracxn",
+    "input_url": "https://tracxn.com/explore/saas-startups-in-india",
+    "expected": {
+      "company_name": "EduBridge Learning",
+      "industry": "EdTech",
+      "location": "Bangalore, India",
+      "company_size": "11-50",
+      "funding_stage": "pre_seed",
+      "tech_stack": ["Next.js", "PostgreSQL", "Stripe"],
+      "email": null,
+      "confidence_min": 0.50
+    },
+    "notes": "EdTech startup — typical seed stage profile"
+  },
+  {
+    "id": "gt_007",
+    "source": "tracxn",
+    "input_url": "https://tracxn.com/explore/saas-startups-in-india",
+    "expected": {
+      "company_name": "LogiChain Solutions",
+      "industry": "Supply Chain",
+      "location": "Chennai, India",
+      "company_size": "201-500",
+      "funding_stage": "series_c",
+      "tech_stack": ["Java", "Spring Boot", "Oracle"],
+      "email": null,
+      "confidence_min": 0.70
+    },
+    "notes": "Series C supply chain — mature company, high confidence data"
+  },
+  {
+    "id": "gt_008",
+    "source": "tracxn",
+    "input_url": "https://tracxn.com/explore/saas-startups-in-india",
+    "expected": {
+      "company_name": "RetailAI",
+      "industry": "Retail Tech",
+      "location": "Gurgaon, India",
+      "company_size": "51-100",
+      "funding_stage": "series_a",
+      "tech_stack": ["React", "Python", "TensorFlow"],
+      "email": null,
+      "confidence_min": 0.60
+    },
+    "notes": "Retail AI startup — moderate public data availability"
+  },
+  {
+    "id": "gt_009",
+    "source": "tracxn",
+    "input_url": "https://tracxn.com/explore/saas-startups-in-india",
+    "expected": {
+      "company_name": "CyberShield",
+      "industry": "Cybersecurity",
+      "location": "Bangalore, India",
+      "company_size": "11-50",
+      "funding_stage": "seed",
+      "tech_stack": ["Go", "Rust", "PostgreSQL"],
+      "email": null,
+      "confidence_min": 0.55
+    },
+    "notes": "Security startup — may have limited public info"
+  },
+  {
+    "id": "gt_010",
+    "source": "tracxn",
+    "input_url": "https://tracxn.com/explore/saas-startups-in-india",
+    "expected": {
+      "company_name": "DevOpsPro",
+      "industry": "Developer Tools",
+      "location": "Hyderabad, India",
+      "company_size": "21-50",
+      "funding_stage": "pre_seed",
+      "tech_stack": ["Next.js", "Node.js", "Docker"],
+      "email": null,
+      "confidence_min": 0.50
+    },
+    "notes": "Developer tools startup — early stage"
+  },
+  {
+    "id": "gt_011",
+    "source": "indimart",
+    "input_url": "https://indimart.com/startups/technology",
+    "expected": {
+      "company_name": "InnoTech Systems",
+      "industry": "Technology Services",
+      "location": "Mumbai, India",
+      "company_size": "51-100",
+      "funding_stage": null,
+      "tech_stack": ["Java", "Spring", "MySQL"],
+      "email": null,
+      "confidence_min": 0.45
+    },
+    "notes": "Indimart - lower confidence, less detailed data"
+  },
+  {
+    "id": "gt_012",
+    "source": "indimart",
+    "input_url": "https://indimart.com/startups/technology",
+    "expected": {
+      "company_name": "TechServe India",
+      "industry": "IT Consulting",
+      "location": "Pune, India",
+      "company_size": "101-200",
+      "funding_stage": null,
+      "tech_stack": ["C#", ".NET", "SQL Server"],
+      "email": null,
+      "confidence_min": 0.40
+    },
+    "notes": "IT services company - basic info only"
+  },
+  {
+    "id": "gt_013",
+    "source": "indimart",
+    "input_url": "https://indimart.com/startups/technology",
+    "expected": {
+      "company_name": "SoftGen Solutions",
+      "industry": "Software Development",
+      "location": "Delhi NCR, India",
+      "company_size": "201-500",
+      "funding_stage": null,
+      "tech_stack": ["PHP", "Laravel", "MySQL"],
+      "email": null,
+      "confidence_min": 0.35
+    },
+    "notes": "Large IT firm - indimart confidence ceiling"
+  },
+  {
+    "id": "gt_014",
+    "source": "indimart",
+    "input_url": "https://indimart.com/startups/technology",
+    "expected": {
+      "company_name": "WebCraft Studios",
+      "industry": "Web Development",
+      "location": "Bangalore, India",
+      "company_size": "11-50",
+      "funding_stage": null,
+      "tech_stack": ["WordPress", "JavaScript", "CSS"],
+      "email": null,
+      "confidence_min": 0.40
+    },
+    "notes": "Web development shop"
+  },
+  {
+    "id": "gt_015",
+    "source": "indimart",
+    "input_url": "https://indimart.com/startups/technology",
+    "expected": {
+      "company_name": "DataSystems India",
+      "industry": "Data Analytics",
+      "location": "Hyderabad, India",
+      "company_size": "51-100",
+      "funding_stage": null,
+      "tech_stack": ["Python", "Spark", "BigQuery"],
+      "email": null,
+      "confidence_min": 0.45
+    },
+    "notes": "Data analytics firm"
+  },
+  {
+    "id": "gt_016",
+    "source": "indimart",
+    "input_url": "https://indimart.com/startups/technology",
+    "expected": {
+      "company_name": "CloudConsult",
+      "industry": "Cloud Services",
+      "location": "Chennai, India",
+      "company_size": "21-50",
+      "funding_stage": null,
+      "tech_stack": ["AWS", "Azure", "Google Cloud"],
+      "email": null,
+      "confidence_min": 0.40
+    },
+    "notes": "Cloud consulting firm"
+  },
+  {
+    "id": "gt_017",
+    "source": "indimart",
+    "input_url": "https://indimart.com/startups/technology",
+    "expected": {
+      "company_name": "CodeMaster",
+      "industry": "Outsourcing",
+      "location": "Gurgaon, India",
+      "company_size": "501-1000",
+      "funding_stage": null,
+      "tech_stack": ["Multiple", "Varies", "Varies"],
+      "email": null,
+      "confidence_min": 0.30
+    },
+    "notes": "Large outsourcing company - very low confidence"
+  },
+  {
+    "id": "gt_018",
+    "source": "indimart",
+    "input_url": "https://indimart.com/startups/technology",
+    "expected": {
+      "company_name": "TechVenture",
+      "industry": "VC Fund",
+      "location": "Mumbai, India",
+      "company_size": "11-50",
+      "funding_stage": null,
+      "tech_stack": null,
+      "email": null,
+      "confidence_min": 0.35
+    },
+    "notes": "VC firm - different data profile"
+  },
+  {
+    "id": "gt_019",
+    "source": "indimart",
+    "input_url": "https://indimart.com/startups/technology",
+    "expected": {
+      "company_name": "InnovateX",
+      "industry": "Innovation Lab",
+      "location": "Bangalore, India",
+      "company_size": "51-100",
+      "funding_stage": null,
+      "tech_stack": ["Experimental", "Various", "Various"],
+      "email": null,
+      "confidence_min": 0.35
+    },
+    "notes": "Innovation lab - unpredictable data"
+  },
+  {
+    "id": "gt_020",
+    "source": "indimart",
+    "input_url": "https://indimart.com/startups/technology",
+    "expected": {
+      "company_name": "StartupHub",
+      "industry": "Incubator",
+      "location": "Pune, India",
+      "company_size": "11-50",
+      "funding_stage": null,
+      "tech_stack": null,
+      "email": null,
+      "confidence_min": 0.30
+    },
+    "notes": "Incubator - minimal data available"
+  },
+  {
+    "id": "gt_021",
+    "source": "github_profile",
+    "input_url": "https://github.com/techfounder",
+    "expected": {
+      "company_name": "Foundry Labs",
+      "industry": "Software",
+      "location": "Remote",
+      "company_size": "1-10",
+      "funding_stage": "pre_seed",
+      "tech_stack": ["JavaScript", "TypeScript", "Node.js"],
+      "email": "founder@foundrylabs.com",
+      "confidence_min": 0.75
+    },
+    "notes": "Founder profile with public email - high confidence"
+  },
+  {
+    "id": "gt_022",
+    "source": "github_profile",
+    "input_url": "https://github.com/engineer0x",
+    "expected": {
+      "company_name": "TechCorp Inc",
+      "industry": "Enterprise Software",
+      "location": "San Francisco, USA",
+      "company_size": "201-500",
+      "funding_stage": "series_c",
+      "tech_stack": ["Java", "Spring", "Oracle"],
+      "email": "john.doe@techcorp.com",
+      "confidence_min": 0.80
+    },
+    "notes": "Established company engineer - public contact"
+  },
+  {
+    "id": "gt_023",
+    "source": "github_profile",
+    "input_url": "https://github.com/open_source_dev",
+    "expected": {
+      "company_name": "OpenSource Co",
+      "industry": "Open Source",
+      "location": "Berlin, Germany",
+      "company_size": "11-50",
+      "funding_stage": "seed",
+      "tech_stack": ["Python", "Go", "PostgreSQL"],
+      "email": "contact@opensource.co",
+      "confidence_min": 0.70
+    },
+    "notes": "Open source company - good public data"
+  },
+  {
+    "id": "gt_024",
+    "source": "github_profile",
+    "input_url": "https://github.com/startup_cto",
+    "expected": {
+      "company_name": "AI Innovations",
+      "industry": "Artificial Intelligence",
+      "location": "Bangalore, India",
+      "company_size": "11-50",
+      "funding_stage": "series_a",
+      "tech_stack": ["Python", "TensorFlow", "PyTorch"],
+      "email": "cto@aiinnovations.com",
+      "confidence_min": 0.75
+    },
+    "notes": "AI startup CTO - public contact"
+  },
+  {
+    "id": "gt_025",
+    "source": "github_profile",
+    "input_url": "https://github.com/sre_engineer",
+    "expected": {
+      "company_name": "ScaleUp Systems",
+      "industry": "Infrastructure",
+      "location": "Remote",
+      "company_size": "51-100",
+      "funding_stage": "series_b",
+      "tech_stack": ["Kubernetes", "Terraform", "AWS"],
+      "email": "ops@scaleupsystems.com",
+      "confidence_min": 0.70
+    },
+    "notes": "SRE profile - infrastructure focus"
+  },
+  {
+    "id": "gt_026",
+    "source": "github_profile",
+    "input_url": "https://github.com/frontend_dev",
+    "expected": {
+      "company_name": "DesignFirst",
+      "industry": "Product Design",
+      "location": "New York, USA",
+      "company_size": "11-50",
+      "funding_stage": "seed",
+      "tech_stack": ["React", "Next.js", "Framer Motion"],
+      "email": "team@designfirst.com",
+      "confidence_min": 0.65
+    },
+    "notes": "Design-focused company"
+  },
+  {
+    "id": "gt_027",
+    "source": "github_profile",
+    "input_url": "https://github.com/data_scientist",
+    "expected": {
+      "company_name": "DataDriven Inc",
+      "industry": "Data Science",
+      "location": "London, UK",
+      "company_size": "51-100",
+      "funding_stage": "series_a",
+      "tech_stack": ["Python", "R", "SQL"],
+      "email": "data@datadriven.com",
+      "confidence_min": 0.70
+    },
+    "notes": "Data science firm"
+  },
+  {
+    "id": "gt_028",
+    "source": "github_profile",
+    "input_url": "https://github.com/mobdev_pro",
+    "expected": {
+      "company_name": "MobileFirst",
+      "industry": "Mobile Development",
+      "location": "San Diego, USA",
+      "company_size": "11-50",
+      "funding_stage": "pre_seed",
+      "tech_stack": ["React Native", "TypeScript", "Node.js"],
+      "email": "mobile@mobilefirst.com",
+      "confidence_min": 0.65
+    },
+    "notes": "Mobile development shop"
+  },
+  {
+    "id": "gt_029",
+    "source": "github_profile",
+    "input_url": "https://github.com/security_expert",
+    "expected": {
+      "company_name": "SecureTech",
+      "industry": "Cybersecurity",
+      "location": "Remote",
+      "company_size": "11-50",
+      "funding_stage": "seed",
+      "tech_stack": ["Go", "Rust", "C++"],
+      "email": "security@securetech.com",
+      "confidence_min": 0.75
+    },
+    "notes": "Security company - high confidence"
+  },
+  {
+    "id": "gt_030",
+    "source": "github_profile",
+    "input_url": "https://github.com/tech_lead",
+    "expected": {
+      "company_name": "Architect Labs",
+      "industry": "Architecture",
+      "location": "Austin, USA",
+      "company_size": "51-100",
+      "funding_stage": "series_b",
+      "tech_stack": ["Multiple", "Systems", "Architect"],
+      "email": "architect@architectlabs.com",
+      "confidence_min": 0.70
+    },
+    "notes": "Architecture-focused tech company"
+  },
+  {
+    "id": "gt_031",
+    "source": "yourstory",
+    "input_url": "https://yourstory.com/startups/technology",
+    "expected": {
+      "company_name": "StoryTech",
+      "industry": "Tech Media",
+      "location": "Mumbai, India",
+      "company_size": "51-100",
+      "funding_stage": null,
+      "tech_stack": ["WordPress", "PHP", "MySQL"],
+      "email": null,
+      "confidence_min": 0.65
+    },
+    "notes": "Tech media startup"
+  },
+  {
+    "id": "gt_032",
+    "source": "yourstory",
+    "input_url": "https://yourstory.com/startups/technology",
+    "expected": {
+      "company_name": "TechVentures",
+      "industry": "Venture Capital",
+      "location": "Delhi NCR, India",
+      "company_size": "11-50",
+      "funding_stage": null,
+      "tech_stack": null,
+      "email": null,
+      "confidence_min": 0.60
+    },
+    "notes": "VC firm listed on YourStory"
+  },
+  {
+    "id": "gt_033",
+    "source": "yourstory",
+    "input_url": "https://yourstory.com/startups/technology",
+    "expected": {
+      "company_name": "InnoVentures",
+      "industry": "Innovation",
+      "location": "Bangalore, India",
+      "company_size": "21-50",
+      "funding_stage": "seed",
+      "tech_stack": ["Varies", "Startups", "Ventures"],
+      "email": null,
+      "confidence_min": 0.55
+    },
+    "notes": "Innovation-focused"
+  },
+  {
+    "id": "gt_034",
+    "source": "yourstory",
+    "input_url": "https://yourstory.com/startups/technology",
+    "expected": {
+      "company_name": "StartupNext",
+      "industry": "Incubator",
+      "location": "Pune, India",
+      "company_size": "11-50",
+      "funding_stage": null,
+      "tech_stack": null,
+      "email": null,
+      "confidence_min": 0.50
+    },
+    "notes": "Incubator - yourstory listing"
+  },
+  {
+    "id": "gt_035",
+    "source": "yourstory",
+    "input_url": "https://yourstory.com/startups/technology",
+    "expected": {
+      "company_name": "GrowthLabs",
+      "industry": "Growth Marketing",
+      "location": "Gurgaon, India",
+      "company_size": "51-100",
+      "funding_stage": "series_a",
+      "tech_stack": ["Marketing", "Analytics", "Tools"],
+      "email": null,
+      "confidence_min": 0.60
+    },
+    "notes": "Growth marketing firm"
+  },
+  {
+    "id": "gt_036",
+    "source": "yourstory",
+    "input_url": "https://yourstory.com/startups/technology",
+    "expected": {
+      "company_name": "TechCircle",
+      "industry": "Tech Community",
+      "location": "Bangalore, India",
+      "company_size": "11-50",
+      "funding_stage": "pre_seed",
+      "tech_stack": ["Community", "Events", "Media"],
+      "email": null,
+      "confidence_min": 0.55
+    },
+    "notes": "Tech community platform"
+  },
+  {
+    "id": "gt_037",
+    "source": "yourstory",
+    "input_url": "https://yourstory.com/startups/technology",
+    "expected": {
+      "company_name": "FounderCircle",
+      "industry": "Founder Network",
+      "location": "Mumbai, India",
+      "company_size": "11-50",
+      "funding_stage": null,
+      "tech_stack": null,
+      "email": null,
+      "confidence_min": 0.50
+    },
+    "notes": "Founder network"
+  },
+  {
+    "id": "gt_038",
+    "source": "yourstory",
+    "input_url": "https://yourstory.com/startups/technology",
+    "expected": {
+      "company_name": "InnovationHub",
+      "industry": "Innovation Lab",
+      "location": "Chennai, India",
+      "company_size": "21-50",
+      "funding_stage": "seed",
+      "tech_stack": ["Innovation", "Experiments", "R&D"],
+      "email": null,
+      "confidence_min": 0.55
+    },
+    "notes": "Innovation lab - yourstory listing"
+  },
+  {
+    "id": "gt_039",
+    "source": "yourstory",
+    "input_url": "https://yourstory.com/startups/technology",
+    "expected": {
+      "company_name": "TechEcosystem",
+      "industry": "Tech Ecosystem",
+      "location": "Hyderabad, India",
+      "company_size": "51-100",
+      "funding_stage": "series_a",
+      "tech_stack": ["Ecosystem", "Networking", "Events"],
+      "email": null,
+      "confidence_min": 0.60
+    },
+    "notes": "Tech ecosystem builder"
+  },
+  {
+    "id": "gt_040",
+    "source": "yourstory",
+    "input_url": "https://yourstory.com/startups/technology",
+    "expected": {
+      "company_name": "StartupMama",
+      "industry": "Parenting Tech",
+      "location": "Bangalore, India",
+      "company_size": "11-50",
+      "funding_stage": "pre_seed",
+      "tech_stack": ["App", "Web", "Content"],
+      "email": null,
+      "confidence_min": 0.50
+    },
+    "notes": "Niche vertical startup"
+  },
+  {
+    "id": "gt_041",
+    "source": "producthunt",
+    "input_url": "https://www.producthunt.com/products/tech-product",
+    "expected": {
+      "company_name": "ProductFirst",
+      "industry": "SaaS",
+      "location": "Remote",
+      "company_size": "1-10",
+      "funding_stage": "pre_seed",
+      "tech_stack": ["Next.js", "PostgreSQL", "Stripe"],
+      "email": "hello@productfirst.com",
+      "confidence_min": 0.70
+    },
+    "notes": "Product Hunt launch - early stage"
+  },
+  {
+    "id": "gt_042",
+    "source": "producthunt",
+    "input_url": "https://www.producthunt.com/products/tech-product",
+    "expected": {
+      "company_name": "AppGrowth",
+      "industry": "App Development",
+      "location": "San Francisco, USA",
+      "company_size": "11-50",
+      "funding_stage": "seed",
+      "tech_stack": ["React Native", "Node.js", "PostgreSQL"],
+      "email": "contact@appgrowth.com",
+      "confidence_min": 0.65
+    },
+    "notes": "App development company"
+  },
+  {
+    "id": "gt_043",
+    "source": "producthunt",
+    "input_url": "https://www.producthunt.com/products/tech-product",
+    "expected": {
+      "company_name": "TechLaunch",
+      "industry": "Product Launch",
+      "location": "New York, USA",
+      "company_size": "51-100",
+      "funding_stage": "series_a",
+      "tech_stack": ["Multi", "Various", "Launch"],
+      "email": "launch@techlaunch.com",
+      "confidence_min": 0.60
+    },
+    "notes": "Product launch platform"
+  },
+  {
+    "id": "gt_044",
+    "source": "producthunt",
+    "input_url": "https://www.producthunt.com/products/tech-product",
+    "expected": {
+      "company_name": "DevTools Pro",
+      "industry": "Developer Tools",
+      "location": "Austin, USA",
+      "company_size": "11-50",
+      "funding_stage": "seed",
+      "tech_stack": ["CLI", "API", "SDK"],
+      "email": "dev@devtoolspro.com",
+      "confidence_min": 0.70
+    },
+    "notes": "Developer tools company"
+  },
+  {
+    "id": "gt_045",
+    "source": "producthunt",
+    "input_url": "https://www.producthunt.com/products/tech-product",
+    "expected": {
+      "company_name": "DesignSystems",
+      "industry": "Design System",
+      "location": "Remote",
+      "company_size": "1-10",
+      "funding_stage": "pre_seed",
+      "tech_stack": ["React", "Storybook", "CSS"],
+      "email": "design@designsystems.com",
+      "confidence_min": 0.65
+    },
+    "notes": "Design system company"
+  },
+  {
+    "id": "gt_046",
+    "source": "producthunt",
+    "input_url": "https://www.producthunt.com/products/tech-product",
+    "expected": {
+      "company_name": "AI Tools Hub",
+      "industry": "AI Tools",
+      "location": "San Diego, USA",
+      "company_size": "11-50",
+      "funding_stage": "series_a",
+      "tech_stack": ["Python", "LLM", "API"],
+      "email": "ai@aitoolshub.com",
+      "confidence_min": 0.70
+    },
+    "notes": "AI tools aggregator"
+  },
+  {
+    "id": "gt_047",
+    "source": "producthunt",
+    "input_url": "https://www.producthunt.com/products/tech-product",
+    "expected": {
+      "company_name": "NoCode Forge",
+      "industry": "No Code",
+      "location": "Miami, USA",
+      "company_size": "11-50",
+      "funding_stage": "seed",
+      "tech_stack": ["Drag", "Drop", "Visual"],
+      "email": "forge@nocodeforge.com",
+      "confidence_min": 0.60
+    },
+    "notes": "No code platform"
+  },
+  {
+    "id": "gt_048",
+    "source": "producthunt",
+    "input_url": "https://www.producthunt.com/products/tech-product",
+    "expected": {
+      "company_name": "CryptoBase",
+      "industry": "Blockchain",
+      "location": "Dubai, UAE",
+      "company_size": "51-100",
+      "funding_stage": "series_b",
+      "tech_stack": ["Solidity", "Web3", "Ethereum"],
+      "email": "cryptoinfotechbase.com",
+      "confidence_min": 0.55
+    },
+    "notes": "Blockchain startup - higher risk profile"
+  },
+  {
+    "id": "gt_049",
+    "source": "producthunt",
+    "input_url": "https://www.producthunt.com/products/tech-product",
+    "expected": {
+      "company_name": "HealthTech Plus",
+      "industry": "Health Tech",
+      "location": "Boston, USA",
+      "company_size": "21-50",
+      "funding_stage": "series_a",
+      "tech_stack": ["React", "Node.js", "Firebase"],
+      "email": "health@healthtechplus.com",
+      "confidence_min": 0.65
+    },
+    "notes": "Health tech company"
+  },
+  {
+    "id": "gt_050",
+    "source": "producthunt",
+    "input_url": "https://www.producthunt.com/products/tech-product",
+    "expected": {
+      "company_name": "GreenTech",
+      "industry": "Clean Tech",
+      "location": "Copenhagen, Denmark",
+      "company_size": "11-50",
+      "funding_stage": "seed",
+      "tech_stack": ["Python", "IoT", "AWS"],
+      "email": "green@greentech.com",
+      "confidence_min": 0.60
+    },
+    "notes": "Clean tech startup"
+  }
+]

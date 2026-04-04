@@ -1,0 +1,198 @@
+{
+  "5c395db18025": {
+    "company_name": "Mock tracxn Company",
+    "industry": "Technology",
+    "location": "Remote",
+    "company_size": "11-50",
+    "funding_stage": "seed",
+    "tech_stack": [
+      "Mock",
+      "Tech",
+      "Stack"
+    ],
+    "email": "contact@mocktracxn.com",
+    "confidence_min": 0.5
+  },
+  "72f95cc57c92": {
+    "company_name": "Mock indimart Company",
+    "industry": "Technology",
+    "location": "Remote",
+    "company_size": "11-50",
+    "funding_stage": "seed",
+    "tech_stack": [
+      "Mock",
+      "Tech",
+      "Stack"
+    ],
+    "email": "contact@mockindimart.com",
+    "confidence_min": 0.5
+  },
+  "4b847dd9b9c2": {
+    "company_name": "Mock github_profile Company",
+    "industry": "Technology",
+    "location": "Remote",
+    "company_size": "11-50",
+    "funding_stage": "seed",
+    "tech_stack": [
+      "Mock",
+      "Tech",
+      "Stack"
+    ],
+    "email": "contact@mockgithub_profile.com",
+    "confidence_min": 0.5
+  },
+  "48040250cbf9": {
+    "company_name": "Mock github_profile Company",
+    "industry": "Technology",
+    "location": "Remote",
+    "company_size": "11-50",
+    "funding_stage": "seed",
+    "tech_stack": [
+      "Mock",
+      "Tech",
+      "Stack"
+    ],
+    "email": "contact@mockgithub_profile.com",
+    "confidence_min": 0.5
+  },
+  "d3568bc4366b": {
+    "company_name": "Mock github_profile Company",
+    "industry": "Technology",
+    "location": "Remote",
+    "company_size": "11-50",
+    "funding_stage": "seed",
+    "tech_stack": [
+      "Mock",
+      "Tech",
+      "Stack"
+    ],
+    "email": "contact@mockgithub_profile.com",
+    "confidence_min": 0.5
+  },
+  "70c4f9b03484": {
+    "company_name": "Mock github_profile Company",
+    "industry": "Technology",
+    "location": "Remote",
+    "company_size": "11-50",
+    "funding_stage": "seed",
+    "tech_stack": [
+      "Mock",
+      "Tech",
+      "Stack"
+    ],
+    "email": "contact@mockgithub_profile.com",
+    "confidence_min": 0.5
+  },
+  "fea0650dc631": {
+    "company_name": "Mock github_profile Company",
+    "industry": "Technology",
+    "location": "Remote",
+    "company_size": "11-50",
+    "funding_stage": "seed",
+    "tech_stack": [
+      "Mock",
+      "Tech",
+      "Stack"
+    ],
+    "email": "contact@mockgithub_profile.com",
+    "confidence_min": 0.5
+  },
+  "2e9af6ef75e4": {
+    "company_name": "Mock github_profile Company",
+    "industry": "Technology",
+    "location": "Remote",
+    "company_size": "11-50",
+    "funding_stage": "seed",
+    "tech_stack": [
+      "Mock",
+      "Tech",
+      "Stack"
+    ],
+    "email": "contact@mockgithub_profile.com",
+    "confidence_min": 0.5
+  },
+  "9907474fae34": {
+    "company_name": "Mock github_profile Company",
+    "industry": "Technology",
+    "location": "Remote",
+    "company_size": "11-50",
+    "funding_stage": "seed",
+    "tech_stack": [
+      "Mock",
+      "Tech",
+      "Stack"
+    ],
+    "email": "contact@mockgithub_profile.com",
+    "confidence_min": 0.5
+  },
+  "da22f56d921e": {
+    "company_name": "Mock github_profile Company",
+    "industry": "Technology",
+    "location": "Remote",
+    "company_size": "11-50",
+    "funding_stage": "seed",
+    "tech_stack": [
+      "Mock",
+      "Tech",
+      "Stack"
+    ],
+    "email": "contact@mockgithub_profile.com",
+    "confidence_min": 0.5
+  },
+  "339fb9efa604": {
+    "company_name": "Mock github_profile Company",
+    "industry": "Technology",
+    "location": "Remote",
+    "company_size": "11-50",
+    "funding_stage": "seed",
+    "tech_stack": [
+      "Mock",
+      "Tech",
+      "Stack"
+    ],
+    "email": "contact@mockgithub_profile.com",
+    "confidence_min": 0.5
+  },
+  "dd64404d6cf6": {
+    "company_name": "Mock github_profile Company",
+    "industry": "Technology",
+    "location": "Remote",
+    "company_size": "11-50",
+    "funding_stage": "seed",
+    "tech_stack": [
+      "Mock",
+      "Tech",
+      "Stack"
+    ],
+    "email": "contact@mockgithub_profile.com",
+    "confidence_min": 0.5
+  },
+  "ead8ef9044b1": {
+    "company_name": "Mock yourstory Company",
+    "industry": "Technology",
+    "location": "Remote",
+    "company_size": "11-50",
+    "funding_stage": "seed",
+    "tech_stack": [
+      "Mock",
+      "Tech",
+      "Stack"
+    ],
+    "email": "contact@mockyourstory.com",
+    "confidence_min": 0.5
+  },
+  "12a86cbec1d7": {
+    "company_name": "Mock producthunt Company",
+    "industry": "Technology",
+    "location": "Remote",
+    "company_size": "11-50",
+    "funding_stage": "seed",
+    "tech_stack": [
+      "Mock",
+      "Tech",
+      "Stack"
+    ],
+    "email": "contact@mockproducthunt.com",
+    "confidence_min": 0.5
+  }
+}
