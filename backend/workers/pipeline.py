@@ -16,10 +16,63 @@ from typing import Any
 
 from celery import Celery
 from celery.utils.log import get_task_logger
+from celery.signals import task_failure, task_retry
+from celery.schedules import crontab
 
 from backend.shared.config import settings
 
 logger = get_task_logger(__name__)
+
+# ── DLQ Signal Wiring ─────────────────────────────────────────────────────────
+
+
+@task_failure.connect
+def on_pipeline_task_failure(
+    sender,
+    task_id,
+    exception,
+    args,
+    kwargs,
+    traceback,
+    einfo,
+    **kw,
+):
+    """Auto-captures ALL pipeline task failures → LeadDLQ."""
+    from backend.workers.dlq import DLQWorker
+    from backend.shared.db import get_db_session
+    from backend.shared.stream import redis_stream
+
+    async def _capture():
+        async with get_db_session() as db:
+            worker = DLQWorker(db, redis_stream._r)
+            lead_id = kwargs.get("lead_id") or (args[0] if args else None)
+            await worker.capture(
+                task_name=sender.name,
+                task_id=task_id,
+                args=list(args),
+                kwargs=dict(kwargs),
+                exc=exception,
+                traceback_str=str(einfo),
+                lead_id=str(lead_id) if lead_id else None,
+                source_url=kwargs.get("url") or kwargs.get("source_url"),
+            )
+
+    loop = asyncio.get_event_loop()
+    if loop.is_running():
+        loop.create_task(_capture())
+    else:
+        loop.run_until_complete(_capture())
+
+
+@task_retry.connect
+def on_pipeline_task_retry(sender, request, reason, einfo, **kw):
+    """Log task retry events."""
+    logger.warning(
+        "task_retrying",
+        task=sender.name,
+        attempt=request.retries,
+        reason=str(reason)[:200],
+    )
 
 # ── Celery app ────────────────────────────────────────────────────────────────
 
@@ -57,6 +110,15 @@ celery_app.conf.update(
             "task": "backend.workers.pipeline.compute_daily_metrics",
             "schedule": 0.0,       # Midnight UTC (crontab: 0 0 * * *)
             "options": {"queue": "metrics"},
+        },
+        "dlq-retries-every-5-min": {
+            "task": "backend.workers.pipeline.process_dlq_retries",
+            "schedule": 300.0,     # 5 minutes
+        },
+        "telegram-monitor-every-2-hours": {
+            "task": "actors.monitor_telegram",
+            "schedule": 7200.0,    # 2 hours
+            "options": {"queue": "monitoring"},
         },
     },
 )
@@ -366,6 +428,27 @@ def compute_daily_metrics(self) -> dict[str, Any]:
             pass
 
         return metrics
+
+    return _run_async(_run())
+
+
+# ── DLQ Retry Processing Task ────────────────────────────────────────────────────
+# This task is added to beat_schedule below
+
+
+@celery_app.task(name="pipeline.process_dlq_retries", bind=True)
+def process_dlq_retries(self):
+    """Runs every 5 minutes — re-queues eligible DLQ records."""
+    async def _run():
+        from backend.shared.db import get_db_session
+        from backend.shared.stream import redis_stream
+        from backend.workers.dlq import DLQWorker
+
+        async with get_db_session() as db:
+            worker = DLQWorker(db, redis_stream._r)
+            results = await worker.process_retries()
+            logger.info("dlq_retries_processed", **results)
+            return results
 
     return _run_async(_run())
 

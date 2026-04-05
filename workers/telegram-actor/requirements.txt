@@ -1,0 +1,4 @@
+# workers/telegram-actor/requirements.txt
+httpx>=0.24.0
+redis>=4.6.0
+beautifulsoup4>=4.12.0

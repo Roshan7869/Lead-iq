@@ -161,163 +161,163 @@
   },
   {
     "id": "gt_011",
-    "source": "indimart",
-    "input_url": "https://indimart.com/startups/technology",
+    "source": "hacker_news",
+    "input_url": "https://news.ycombinator.com/from?site=techstartup",
     "expected": {
-      "company_name": "InnoTech Systems",
-      "industry": "Technology Services",
-      "location": "Mumbai, India",
-      "company_size": "51-100",
-      "funding_stage": null,
-      "tech_stack": ["Java", "Spring", "MySQL"],
+      "company_name": "FoundersLab",
+      "industry": "Developer Tools",
+      "location": "Remote",
+      "company_size": "1-10",
+      "funding_stage": "pre_seed",
+      "tech_stack": ["Rust", "Actix", "SQLite"],
       "email": null,
-      "confidence_min": 0.45
+      "confidence_min": 0.75
     },
-    "notes": "Indimart - lower confidence, less detailed data"
+    "notes": "HN self-post - founder profile, minimal contact info"
   },
   {
     "id": "gt_012",
-    "source": "indimart",
-    "input_url": "https://indimart.com/startups/technology",
+    "source": "hacker_news",
+    "input_url": "https://news.ycombinator.com/from?site=saascompany",
     "expected": {
-      "company_name": "TechServe India",
-      "industry": "IT Consulting",
-      "location": "Pune, India",
-      "company_size": "101-200",
-      "funding_stage": null,
-      "tech_stack": ["C#", ".NET", "SQL Server"],
+      "company_name": "ScaleUp Inc",
+      "industry": "SaaS",
+      "location": "San Francisco, USA",
+      "company_size": "11-50",
+      "funding_stage": "seed",
+      "tech_stack": ["Next.js", "PostgreSQL", "Clerk"],
       "email": null,
-      "confidence_min": 0.40
+      "confidence_min": 0.80
     },
-    "notes": "IT services company - basic info only"
+    "notes": "HN startup post - technical details present"
   },
   {
     "id": "gt_013",
-    "source": "indimart",
-    "input_url": "https://indimart.com/startups/technology",
+    "source": "hacker_news",
+    "input_url": "https://news.ycombinator.com/from?site=aistartup",
     "expected": {
-      "company_name": "SoftGen Solutions",
-      "industry": "Software Development",
-      "location": "Delhi NCR, India",
-      "company_size": "201-500",
-      "funding_stage": null,
-      "tech_stack": ["PHP", "Laravel", "MySQL"],
+      "company_name": "AI Solutions",
+      "industry": "AI/ML",
+      "location": "Bangalore, India",
+      "company_size": "11-50",
+      "funding_stage": "pre_seed",
+      "tech_stack": ["Python", "PyTorch", "FastAPI"],
       "email": null,
-      "confidence_min": 0.35
+      "confidence_min": 0.70
     },
-    "notes": "Large IT firm - indimart confidence ceiling"
+    "notes": "AI startup on HN - moderate data availability"
   },
   {
     "id": "gt_014",
-    "source": "indimart",
-    "input_url": "https://indimart.com/startups/technology",
+    "source": "hacker_news",
+    "input_url": "https://news.ycombinator.com/from?site=edtech",
     "expected": {
-      "company_name": "WebCraft Studios",
-      "industry": "Web Development",
-      "location": "Bangalore, India",
-      "company_size": "11-50",
-      "funding_stage": null,
-      "tech_stack": ["WordPress", "JavaScript", "CSS"],
+      "company_name": "EduTech Pro",
+      "industry": "EdTech",
+      "location": "New Delhi, India",
+      "company_size": "21-50",
+      "funding_stage": "seed",
+      "tech_stack": ["React", "Node.js", "AWS"],
       "email": null,
-      "confidence_min": 0.40
+      "confidence_min": 0.75
     },
-    "notes": "Web development shop"
+    "notes": "EdTech startup - decent public data"
   },
   {
     "id": "gt_015",
-    "source": "indimart",
-    "input_url": "https://indimart.com/startups/technology",
+    "source": "hacker_news",
+    "input_url": "https://news.ycombinator.com/from?site=fintech",
     "expected": {
-      "company_name": "DataSystems India",
-      "industry": "Data Analytics",
-      "location": "Hyderabad, India",
-      "company_size": "51-100",
-      "funding_stage": null,
-      "tech_stack": ["Python", "Spark", "BigQuery"],
+      "company_name": "FinLab",
+      "industry": "Fintech",
+      "location": "Mumbai, India",
+      "company_size": "11-50",
+      "funding_stage": "series_a",
+      "tech_stack": ["Go", "PostgreSQL", "Redis"],
       "email": null,
-      "confidence_min": 0.45
+      "confidence_min": 0.80
     },
-    "notes": "Data analytics firm"
+    "notes": "Fintech startup - higher confidence signals"
   },
   {
     "id": "gt_016",
-    "source": "indimart",
-    "input_url": "https://indimart.com/startups/technology",
+    "source": "hacker_news",
+    "input_url": "https://news.ycombinator.com/from?site=cybersecurity",
     "expected": {
-      "company_name": "CloudConsult",
-      "industry": "Cloud Services",
-      "location": "Chennai, India",
-      "company_size": "21-50",
-      "funding_stage": null,
-      "tech_stack": ["AWS", "Azure", "Google Cloud"],
+      "company_name": "SecureCode",
+      "industry": "Cybersecurity",
+      "location": "Remote",
+      "company_size": "1-10",
+      "funding_stage": "pre_seed",
+      "tech_stack": ["Go", "Rust", "C++"],
       "email": null,
-      "confidence_min": 0.40
+      "confidence_min": 0.75
     },
-    "notes": "Cloud consulting firm"
+    "notes": "Security startup - technical details present"
   },
   {
     "id": "gt_017",
-    "source": "indimart",
-    "input_url": "https://indimart.com/startups/technology",
+    "source": "hacker_news",
+    "input_url": "https://news.ycombinator.com/from?site=devtools",
     "expected": {
-      "company_name": "CodeMaster",
-      "industry": "Outsourcing",
-      "location": "Gurgaon, India",
-      "company_size": "501-1000",
-      "funding_stage": null,
-      "tech_stack": ["Multiple", "Varies", "Varies"],
+      "company_name": "DevTools IO",
+      "industry": "Developer Tools",
+      "location": "Austin, USA",
+      "company_size": "11-50",
+      "funding_stage": "seed",
+      "tech_stack": ["Node.js", "Express", "MongoDB"],
       "email": null,
-      "confidence_min": 0.30
+      "confidence_min": 0.70
     },
-    "notes": "Large outsourcing company - very low confidence"
+    "notes": "Developer tools company"
   },
   {
     "id": "gt_018",
-    "source": "indimart",
-    "input_url": "https://indimart.com/startups/technology",
+    "source": "hacker_news",
+    "input_url": "https://news.ycombinator.com/from?site=blockchain",
     "expected": {
-      "company_name": "TechVenture",
-      "industry": "VC Fund",
-      "location": "Mumbai, India",
+      "company_name": "ChainTech",
+      "industry": "Blockchain",
+      "location": "Dubai, UAE",
       "company_size": "11-50",
-      "funding_stage": null,
-      "tech_stack": null,
+      "funding_stage": "seed",
+      "tech_stack": ["Solidity", "React", "Web3"],
       "email": null,
-      "confidence_min": 0.35
+      "confidence_min": 0.65
     },
-    "notes": "VC firm - different data profile"
+    "notes": "Blockchain startup - higher risk, moderate data"
   },
   {
     "id": "gt_019",
-    "source": "indimart",
-    "input_url": "https://indimart.com/startups/technology",
+    "source": "hacker_news",
+    "input_url": "https://news.ycombinator.com/from?site=healthtech",
     "expected": {
-      "company_name": "InnovateX",
-      "industry": "Innovation Lab",
-      "location": "Bangalore, India",
-      "company_size": "51-100",
-      "funding_stage": null,
-      "tech_stack": ["Experimental", "Various", "Various"],
+      "company_name": "HealthIO",
+      "industry": "Health Tech",
+      "location": "Boston, USA",
+      "company_size": "11-50",
+      "funding_stage": "pre_seed",
+      "tech_stack": ["Python", "Django", "PostgreSQL"],
       "email": null,
-      "confidence_min": 0.35
+      "confidence_min": 0.70
     },
-    "notes": "Innovation lab - unpredictable data"
+    "notes": "Health tech startup"
   },
   {
     "id": "gt_020",
-    "source": "indimart",
-    "input_url": "https://indimart.com/startups/technology",
+    "source": "hacker_news",
+    "input_url": "https://news.ycombinator.com/from?site=gaming",
     "expected": {
-      "company_name": "StartupHub",
-      "industry": "Incubator",
-      "location": "Pune, India",
-      "company_size": "11-50",
-      "funding_stage": null,
-      "tech_stack": null,
+      "company_name": "GameDev Studio",
+      "industry": "Gaming",
+      "location": "Copenhagen, Denmark",
+      "company_size": "1-10",
+      "funding_stage": "pre_seed",
+      "tech_stack": ["Unity", "C#", "Azure"],
       "email": null,
-      "confidence_min": 0.30
+      "confidence_min": 0.65
     },
-    "notes": "Incubator - minimal data available"
+    "notes": "Gaming startup - niche vertical"
   },
   {
     "id": "gt_021",

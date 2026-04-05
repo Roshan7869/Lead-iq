@@ -18,5 +18,30 @@
     ]
   },
   "autoApprove": false,
-  "contextWindow": "auto"
+  "contextWindow": "auto",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "code-review-graph update --quiet",
+            "if": "Edit|Write|Bash"
+          }
+        ],
+        "timeout": 5000
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "code-review-graph status --json"
+          }
+        ],
+        "timeout": 3000
+      }
+    ]
+  }
 }

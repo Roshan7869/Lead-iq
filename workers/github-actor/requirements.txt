@@ -1,0 +1,3 @@
+# workers/github-actor/requirements.txt
+httpx>=0.24.0
+redis>=4.6.0

@@ -184,3 +184,68 @@ class PersonalizedLeadOut(LeadOut):
     keyword_bonus:      float = Field(0.0, description="Points added from include_keywords matches.")
     feedback_bonus:     float = Field(0.0, description="Points from learned feedback history.")
     velocity_bonus:     float = Field(0.0, description="Points from cross-platform signal velocity.")
+
+
+# ── Dead Letter Queue (DLQ) ────────────────────────────────────────────────────
+
+class LeadDLQRead(BaseModel):
+    """Schema for LeadDLQ response data."""
+    id: str
+    original_lead_id: str | None
+    original_lead_data: dict[str, Any]
+    failure_type: str
+    error_message: str | None
+    retry_count: int
+    max_retries: int
+    stage: str
+    created_at: datetime
+    updated_at: datetime
+    resolved_at: datetime | None
+    resolved_by: str | None
+    lead_id: str | None
+    source_url: str | None
+
+
+class DLQStats(BaseModel):
+    """Schema for DLQ statistics."""
+    total: int
+    by_stage: dict[str, int]
+    by_task: dict[str, int]
+    failed_permanent: int
+    oldest_failure: datetime | None
+
+
+class DLQDashboardResponse(BaseModel):
+    """Schema for full DLQ dashboard response."""
+    stats: DLQStats
+    recent_failures: list[LeadDLQRead]
+
+
+class DLQRetryRequest(BaseModel):
+    """Request for retrying a DLQ record."""
+    pass  # No input needed - just DLQ ID in path
+
+
+class DLQRetryResponse(BaseModel):
+    """Response for DLQ retry action."""
+    status: str
+    dlq_id: str
+    task_name: str
+    next_retry_at: datetime
+
+
+class DLQResolveResponse(BaseModel):
+    """Response for DLQ resolve action."""
+    status: str
+    dlq_id: str
+
+
+class DLQDeleteResponse(BaseModel):
+    """Response for DLQ delete action."""
+    status: str
+    dlq_id: str
+
+
+class DLQStatsResponse(BaseModel):
+    """Response for DLQ stats endpoint."""
+    stats: DLQStats
