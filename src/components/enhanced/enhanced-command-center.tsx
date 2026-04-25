@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useLeads } from '@/hooks/use-leads';
-import { STAGE_CONFIG, PRIORITY_ICON, LeadStage } from '@/types/lead';
 import { Text } from '@/components/ui/text';
 
 type Line = { 
@@ -11,7 +10,6 @@ type Line = {
   timestamp?: string;
 };
 
-const STAGES: LeadStage[] = ['detected', 'qualified', 'contacted', 'meeting', 'closed'];
 
 export function EnhancedCommandCenter() {
   const { leads } = useLeads();
@@ -35,7 +33,7 @@ export function EnhancedCommandCenter() {
 
   const addLines = (newLines: Line[]) => setLines(prev => [...prev, ...newLines]);
 
-  const simulateAIProcessing = async (command: string) => {
+  const simulateAIProcessing = async (_cmd: string) => {
     setIsProcessing(true);
     addLines([{ type: 'system', text: '🧠 AI processing...' }]);
     
@@ -69,7 +67,9 @@ export function EnhancedCommandCenter() {
       case '/analyze-leads':
         await simulateAIProcessing(command);
         const hotLeads = leads.filter(l => l.priority === 'hot').length;
-        const avgIntent = (leads.reduce((sum, l) => sum + l.intentScore, 0) / leads.length).toFixed(1);
+        const avgIntent = leads.length > 0
+          ? (leads.reduce((sum, l) => sum + l.intentScore, 0) / leads.length).toFixed(1)
+          : '0.0';
         addLines([
           { type: 'system', text: '🧠 AI LEAD ANALYSIS COMPLETE' },
           { type: 'success', text: `  📊 Total Leads Analyzed: ${leads.length}` },
@@ -88,7 +88,7 @@ export function EnhancedCommandCenter() {
           { type: 'system', text: '🎯 AI-RANKED TOP OPPORTUNITIES' },
           ...top.map((l, i) => ({
             type: 'success' as const,
-            text: `  ${i + 1}. ${PRIORITY_ICON[l.priority]} ${l.name} (${l.company}) — AI Score: ${(l.intentScore * (l.estimatedValue/50000)).toFixed(0)} — ₹${(l.estimatedValue / 1000).toFixed(0)}K`,
+            text: `  ${i + 1}. [${l.priority.toUpperCase()}] ${l.name} (${l.company}) — AI Score: ${(l.intentScore * (l.estimatedValue/50000)).toFixed(0)} — ₹${(l.estimatedValue / 1000).toFixed(0)}K`,
           })),
           { type: 'warning', text: '  💡 AI suggests contacting within 24 hours for optimal conversion' },
         ]);

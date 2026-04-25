@@ -15,6 +15,7 @@ from typing import Any
 
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 
 from backend.shared.models import Feedback, Lead, Post, QuotaUsage, UserProfile
@@ -31,6 +32,16 @@ class PostRepo:
             select(Post.id).where(Post.content_hash == content_hash).limit(1)
         )
         return result.scalar() is not None
+
+    async def get_by_hash(self, content_hash: str) -> Post | None:
+        """Get post by content hash, or None if not found."""
+        result = await self._s.execute(
+            select(Post)
+            .options(selectinload(Post.lead))
+            .where(Post.content_hash == content_hash)
+            .limit(1)
+        )
+        return result.scalar_one_or_none()
 
     async def create(self, data: dict[str, Any]) -> Post:
         post = Post(**data)
@@ -81,7 +92,11 @@ class LeadRepo:
         limit: int = 200,
         offset: int = 0,
     ) -> list[Lead]:
-        q = select(Lead).where(Lead.final_score >= min_score)
+        q = (
+            select(Lead)
+            .options(selectinload(Lead.post))
+            .where(Lead.final_score >= min_score)
+        )
         if stage:
             q = q.where(Lead.stage == stage)
         q = q.order_by(Lead.final_score.desc()).limit(limit).offset(offset)

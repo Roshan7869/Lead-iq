@@ -37,7 +37,7 @@ from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
-from backend.shared.database import Base
+from backend.shared.db import Base
 
 
 class LeadEventType(str, PyEnum):

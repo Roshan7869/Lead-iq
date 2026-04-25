@@ -11,9 +11,11 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
 
+from backend.api.deps import OptionalUser
 from backend.services.auth import (
     create_access_token,
     create_refresh_token,
+    revoke_token,
     verify_credentials,
     verify_token,
 )
@@ -37,6 +39,10 @@ class TokenResponse(BaseModel):
 
 class RefreshRequest(BaseModel):
     refresh_token: str
+
+
+class LogoutRequest(BaseModel):
+    refresh_token: str | None = None
 
 
 class MeResponse(BaseModel):
@@ -68,7 +74,8 @@ async def login(body: LoginRequest) -> TokenResponse:
 
 @router.post("/refresh", response_model=TokenResponse)
 async def refresh(body: RefreshRequest) -> TokenResponse:
-    """Exchange a valid refresh token for a new access + refresh token pair."""
+    """Exchange a valid refresh token for a new access + refresh token pair.
+    The old refresh token is revoked after successful verification."""
     try:
         username = verify_token(body.refresh_token, expected_type="refresh")
     except ValueError as exc:
@@ -78,6 +85,9 @@ async def refresh(body: RefreshRequest) -> TokenResponse:
             headers={"WWW-Authenticate": "Bearer"},
         ) from exc
 
+    # Revoke the used refresh token to prevent replay attacks
+    revoke_token(body.refresh_token)
+
     return TokenResponse(
         access_token  = create_access_token(username),
         refresh_token = create_refresh_token(username),
@@ -86,25 +96,21 @@ async def refresh(body: RefreshRequest) -> TokenResponse:
 
 
 @router.get("/me", response_model=MeResponse)
-async def me(token: str = "") -> MeResponse:
+async def me(user: OptionalUser) -> MeResponse:
     """
-    Verify an access token and return the username.
-    Token is passed as query param ?token=<jwt> (browser-friendly) or
-    read from the Authorization header by the dependency in protected routes.
+    Verify the access token from the Authorization header and return the username.
     """
-    if not token:
+    if not user:
         return MeResponse(username="", authenticated=False)
-    try:
-        username = verify_token(token, expected_type="access")
-        return MeResponse(username=username, authenticated=True)
-    except ValueError:
-        return MeResponse(username="", authenticated=False)
+    return MeResponse(username=user, authenticated=True)
 
 
 @router.post("/logout")
-async def logout() -> dict:
+async def logout(body: LogoutRequest) -> dict:
     """
-    Stateless JWT — real logout happens client-side by deleting stored tokens.
-    This endpoint exists for audit logging purposes.
+    Revoke the provided refresh token server-side so it can no longer be used.
+    Clients should still delete stored tokens locally.
     """
+    if body.refresh_token:
+        revoke_token(body.refresh_token)
     return {"detail": "Logged out. Delete stored tokens client-side."}

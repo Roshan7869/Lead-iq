@@ -15,14 +15,12 @@ from fastapi import APIRouter, Query
 
 from backend.api.deps import DbSession, CurrentUser
 from backend.api.schemas import (
-    LeadOut,
     PersonalizedLeadOut,
     UserProfileRequest,
     UserProfileResponse,
 )
 from backend.services.personalization import (
-    compute_personalized_score,
-    passes_keyword_filter,
+    build_personalized_results,
     OperationMode,
 )
 from backend.services.velocity import velocity_tracker
@@ -83,9 +81,7 @@ async def personalised_leads(
     limit: int = Query(50, ge=1, le=200),
     min_base_score: float = Query(0.0, ge=0.0, le=100.0),
 ) -> list[PersonalizedLeadOut]:
-    """
-    Return leads ranked by personalised score with real-time velocity annotations.
-    """
+    """Return leads ranked by personalised score with real-time velocity annotations."""
     profile_repo = ProfileRepo(session)
     lead_repo    = LeadRepo(session)
 
@@ -101,57 +97,11 @@ async def personalised_leads(
             "feedback_adjustments": profile.feedback_adjustments or {},
         }
 
-    exclude_kw: list[str] = profile_data.get("exclude_keywords", [])
-
-    # Fetch a broad pool then re-rank in Python
     leads = await lead_repo.list_all(min_score=min_base_score, limit=500)
-
-    # Batch-fetch velocity counts for all company names (single Redis pipeline)
     company_names = [l.company_name for l in leads if l.company_name]
     velocity_map  = await velocity_tracker.get_velocity_map(company_names)
 
-    result: list[PersonalizedLeadOut] = []
-    for lead in leads:
-        signal_text = " ".join(filter(None, [
-            lead.company_name, lead.industry, lead.intent,
-            getattr(lead, "post", None) and getattr(lead.post, "body", None) or "",
-        ]))
-        if exclude_kw and not passes_keyword_filter(signal_text, exclude_kw):
-            continue
-
-        collected_iso = (
-            lead.created_at.isoformat()
-            if lead.created_at
-            else datetime.now(UTC).isoformat()
-        )
-
-        # Velocity: use real Redis count if available
-        cross_source_count = velocity_map.get(lead.company_name or "", 0)
-
-        breakdown = compute_personalized_score(
-            base_final_score=lead.final_score,
-            collected_at_iso=collected_iso,
-            industry=lead.industry,
-            company_size=lead.company_size,
-            intent=lead.intent or "other",
-            text_for_keywords=signal_text,
-            profile_data=profile_data,
-            cross_source_count=cross_source_count,
-        )
-
-        base_out = LeadOut.model_validate(lead)
-        result.append(PersonalizedLeadOut(
-            **base_out.model_dump(),
-            personalized_score=breakdown["personalized_score"],
-            temporal_decay=breakdown["temporal_decay"],
-            profile_fit=breakdown["profile_fit"],
-            keyword_bonus=breakdown["keyword_bonus"],
-            feedback_bonus=breakdown["feedback_bonus"],
-            velocity_bonus=breakdown["velocity_bonus"],
-        ))
-
-    result.sort(key=lambda x: x.personalized_score, reverse=True)
-    return result[:limit]
+    return await build_personalized_results(leads, profile_data, velocity_map, limit)
 
 
 @router.get("/velocity")

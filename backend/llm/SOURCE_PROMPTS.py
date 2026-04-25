@@ -269,3 +269,273 @@ FIELDS TO EXTRACT:
 
 CONFIDENCE CEILING: 0.40 (generic LLM extraction, needs validation)
 """
+
+
+# ── India-Specific Intent Signals (Karpathy: source vocabulary first) ───────────
+# These are NOT LLM-generated. They're domain knowledge encoded as lookups.
+# Used by _build_prompt() to inject source-specific context.
+
+INDIA_SIGNALS_LOOKUP: dict[str, dict[str, list[str]]] = {
+    "tracxn": {
+        "high_intent": [
+            "funding",
+            "acquired",
+            "Series",
+            "valuation",
+        ],
+        "company_stage": [
+            "Seed",
+            "Series A",
+            "Series B",
+            "Growth",
+        ],
+        "funding_keywords": [
+            "million",
+            "billion",
+            "valuation",
+        ],
+    },
+    "indimart": {
+        "high_intent": [
+            "manufacturer",
+            "supplier",
+            "exporter",
+            "wholesaler",
+        ],
+        "company_stage": [
+            "SME",
+            "MSME",
+            "micro enterprise",
+            "small enterprise",
+        ],
+        "funding_keywords": [
+            "turnover",
+            "annual revenue",
+        ],
+    },
+    "github_profile": {
+        "high_intent": [
+            "hireable",
+            "open to opportunities",
+            "freelance",
+            "available for work",
+        ],
+        "company_stage": [
+            "organization",
+            "personal",
+            "company",
+        ],
+        "funding_keywords": [
+            "sponsor",
+            "funding",
+            "backed by",
+        ],
+    },
+    "yourstory": {
+        "high_intent": [
+            "raised",
+            "funding",
+            "Series",
+            "valuation",
+            "investors",
+        ],
+        "company_stage": [
+            "seed stage",
+            "Series A",
+            "growth stage",
+            "unicorn",
+        ],
+        "funding_keywords": [
+            "$",
+            "million",
+            "crore",
+            "funding round",
+        ],
+    },
+    "producthunt": {
+        "high_intent": [
+            "launching",
+            "new product",
+            "beta",
+            "waitlist",
+        ],
+        "company_stage": [
+            "launching",
+            "launched",
+            "featured",
+        ],
+        "funding_keywords": [
+            "backed by",
+            "investors",
+        ],
+    },
+    "hacker_news": {
+        "high_intent": [
+            "hiring",
+            "we're hiring",
+            "looking for",
+            "join our team",
+            "remote",
+            "ask hn",
+        ],
+        "company_stage": [
+            "seed",
+            "Series A",
+            "YC",
+            "bootstrapped",
+        ],
+        "funding_keywords": [
+            "raised",
+            "funding",
+            "investors",
+        ],
+    },
+    "dpiit": {
+        "high_intent": [
+            "DPIIT recognized",
+            "Startup India",
+            "registered startup",
+            "government certified",
+        ],
+        "company_stage": [
+            "Ideation",
+            "Validation",
+            "Early Traction",
+            "Scaling",
+        ],
+        "funding_keywords": [
+            "seed funded",
+            "Series A",
+            "bootstrapped",
+        ],
+    },
+    "mca21": {
+        "high_intent": [
+            "Active",
+            "Paid-up Capital",
+            "Authorized Capital",
+            "Director DIN",
+        ],
+        "company_stage": [
+            "Private Limited",
+            "Limited",
+            "OPC",
+            "LLP",
+        ],
+        "funding_keywords": [
+            "authorized capital",
+            "paid up capital",
+        ],
+    },
+}
+
+
+def _build_prompt(
+    text: str,
+    source: str,
+    author: str = "",
+    mode: str = "b2b_sales",
+) -> str:
+    """
+    Construct source-specific prompt following 3-layer architecture.
+
+    Layer 1: Persona + Mission (Andrew Ng: define agent's identity)
+    Layer 2: Source Context Block (Karpathy: source vocabulary first)
+    Layer 3: Extraction Rules (Dario Amodei: 8 conservative constraints)
+
+    Args:
+        text: Raw post/signal text to analyze
+        source: Data source identifier (tracxn, hacker_news, etc.)
+        author: Author/poster name if available
+        mode: Analysis mode (b2b_sales, hiring, job_search, opportunity)
+
+    Returns:
+        Fully constructed prompt for Gemini
+    """
+    # Layer 1: Persona + Mission
+    persona_block = """You are a B2B sales intelligence analyst.
+Your mission: Extract structured business signals from unstructured text.
+You are conservative. You never guess. You prefer null over hallucination."""
+
+    # Layer 2: Source Context Block
+    source_prompt = SOURCE_PROMPTS.get(source, get_generic_prompt())
+
+    # Get source-specific signals if available
+    signals = INDIA_SIGNALS_LOOKUP.get(source, {})
+    signals_block = ""
+    if signals:
+        high_intent = signals.get("high_intent", [])
+        signals_block = f"""
+SOURCE-SPECIFIC SIGNALS (use these to identify intent):
+High Intent Keywords: {', '.join(high_intent)}
+"""
+
+    # Layer 3: Extraction Rules (Constitutional AI - Amodei)
+    extraction_rules = """
+EXTRACTION RULES (follow these strictly):
+1. If a field cannot be extracted, use null (never guess or infer)
+2. Confidence reflects data quality, NOT how promising the lead is
+3. Source-specific signals above are your PRIMARY evidence
+4. Company names must be EXACT - no abbreviations or assumptions
+5. Industry should be a standard category (SaaS, Fintech, HealthTech, etc.)
+6. Company size must be ONE of: startup, smb, enterprise, unknown
+7. Intent taxonomy: buy | evaluate | pain | compare | other
+8. Urgency: high (active within 7 days) | medium (within 30 days) | low
+
+RULE 9 (Most Important): Conservative bias. It is better to miss a lead
+than to report a false positive. A false positive wastes a salesperson's
+time and trains them to distrust the system.
+
+OUTPUT FORMAT (JSON only, no markdown):
+{{
+  "is_opportunity": <boolean>,
+  "confidence": <float 0.0-1.0>,
+  "intent": "<buy|evaluate|pain|compare|other>",
+  "urgency": "<high|medium|low>",
+  "reason": "<one sentence explanation>",
+  "company_name": "<string or null>",
+  "company_size": "<startup|smb|enterprise|unknown>",
+  "industry": "<string or null>",
+  "contact_name": "<string or null>",
+  "contact_title": "<string or null>",
+  "icp_fit_score": <int 0-100>,
+  "outreach_draft": "<string or null>"
+}}
+"""
+
+    # Mode-specific additions
+    mode_context = ""
+    if mode == "hiring":
+        mode_context = """
+MODE: HIRING INTELLIGENCE
+Focus on: open positions, team growth, funding stage, tech stack mentioned.
+is_opportunity = true if: active hiring signal, scaling team, Series A+ funding.
+"""
+    elif mode == "job_search":
+        mode_context = """
+MODE: JOB SEARCH
+Focus on: job title, remote/onsite, salary range, required skills.
+is_opportunity = true if: genuine open role, clear requirements, legitimate company.
+"""
+    elif mode == "opportunity":
+        mode_context = """
+MODE: MARKET OPPORTUNITY
+Focus on: pain points, gaps in market, underserved segments.
+is_opportunity = true if: repeated pain mentions, no good solution exists, growing demand.
+"""
+
+    # Combine all layers
+    full_prompt = f"""{persona_block}
+
+{source_prompt}
+{signals_block}
+{mode_context}
+{extraction_rules}
+
+INPUT DATA:
+Source: {source}
+Author: {author or 'Unknown'}
+Text: {text[:8000]}
+
+OUTPUT (JSON only, no markdown):"""
+    return full_prompt

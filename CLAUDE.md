@@ -119,6 +119,10 @@ the codebase.** The graph is faster, cheaper (fewer tokens), and gives
 you structural context (callers, dependents, test coverage) that file
 scanning cannot.
 
+**Note:** These tools are built-in to Claude Code - no installation needed:
+- `mcp__code-review-graph__*` - Access graph via MCP protocol
+- Graph database: `/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/.code-review-graph/graph.db`
+
 ### When to use graph tools FIRST
 
 - **Exploring code**: `semantic_search_nodes` or `query_graph` instead of Grep
@@ -174,3 +178,70 @@ See [`.env.example`](.env.example) for full documentation.
 | `REDDIT_CLIENT_SECRET` | Optional | — | Reddit API credentials |
 | `TWITTER_BEARER_TOKEN` | Optional | — | Twitter API token |
 | `GITHUB_TOKEN` | Optional | — | GitHub API token |
+
+## Code Graph & Planning Stack
+
+### 4 Core Tools for Claude Code Project Planning
+
+**IMPORTANT:** Lead-iq uses a 4-tool planning stack that must be configured before any coding work:
+
+#### 1. code-review-graph — Persistent Codebase Memory
+```bash
+# Install (one-time setup)
+pip install code-review-graph
+code-review-graph install
+```
+- Builds persistent structural map of entire codebase
+- Stores every function, class, import, and call in SQLite database
+- **Before coding:** Query graph FIRST to find blast radius
+- **Never re-read unchanged files** — the graph has their structure
+- Commands:
+  ```bash
+  code-review-graph query --changed-files  # Find affected files
+  code-review-graph list                   # List all nodes
+  code-review-graph get <node_id>          # Get specific node details
+  ```
+
+#### 2. sequential-thinking MCP — Multi-Step Reasoning
+- Used for: planning, debugging, multi-file changes, architectural decisions
+- **Always use for:** complex tasks, refactoring, new features
+- **Never skip:** for non-trivial tasks as per CLAUDE.md rules
+
+#### 3. Plan Mode (Shift+Tab) — Architecture Before Code
+- Forces exploration before writing any code
+- Generates multi-phase plan you approve first
+- Workflow: **Plan → Setup → Build**
+
+#### 4. ROADMAP.md — Session Continuity
+- Single file Claude reads at session start
+- Tracks sprint progress and completed tasks
+- **Always update:** when tasks complete, add session notes
+
+## Remediation Patterns (Post-Audit 2026-04-25)
+
+### Frontend
+- **React Query:** All server state uses `@tanstack/react-query` (`useQuery`, `useMutation`). No raw `fetch` in hooks.
+- **Strict TypeScript:** `tsconfig.json` has `strict: true`, `noImplicitAny: true`, `strictNullChecks: true`.
+- **`ssr: false` in App Router:** `next/dynamic` with `ssr: false` MUST be inside a Client Component (`"use client"`).
+- **Error Handling:** Async effects use try/catch/finally; `isMounted` guards prevent state updates after unmount.
+
+### Backend
+- **Auth:** Token blocklist in `services/auth.py` (`_token_blocklist: set[str]`). `verify_token()` checks blocklist for refresh tokens.
+- **Config:** `shared/config.py` reads settings dynamically inside functions (no module-level cache). No hardcoded defaults.
+- **Async Patterns:** NEVER use `loop.run_until_complete()` in Celery workers. Use `asyncio.run()` or native async.
+- **DB Queries:** Use `selectinload()` in repositories to eliminate N+1 queries.
+- **Redis:** Use `scan_iter()` instead of `KEYS` to avoid blocking.
+- **Error Handling:** Raise specific exceptions (`GeminiExtractionError`) instead of returning error dicts.
+
+### Testing
+- `conftest.py` adds project root to `sys.path` and sets dummy env vars (`SECRET_KEY`, `DATABASE_URL`, etc.) so `Settings()` instantiates during collection.
+- Run: `cd backend && ./venv/bin/python -m pytest tests/ -q`
+
+### Session Protocol
+1. **READ** `ROADMAP.md` completely at session start
+2. **IDENTIFY** which task is In Progress
+3. **SWITCH** to Plan Mode (Shift+Tab) for complex tasks
+4. **QUERY** code-review-graph for blast radius
+5. **USE** sequential thinking MCP for non-trivial tasks
+6. **EXECUTE** only the approved next step
+7. **VERIFY** and update ROADMAP.md after completion

@@ -180,10 +180,10 @@ async def deploy_check(
         from sqlalchemy import text
         tables = ["leads", "icps", "lead_events", "profiles"]
         for table in tables:
-            result = await session.execute(text(
-                f"SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = '{table}')"
-            ))
-            exists = result.scalar()
+            table_result = await session.execute(
+                text("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = :t)").params(t=table)
+            )
+            exists = table_result.scalar()
             result["checks"][f"table_{table}"] = "ok" if exists else "missing"
     except Exception as e:
         result["checks"]["table_check"] = "error"

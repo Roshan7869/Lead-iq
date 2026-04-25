@@ -57,11 +57,12 @@ def on_pipeline_task_failure(
                 source_url=kwargs.get("url") or kwargs.get("source_url"),
             )
 
-    loop = asyncio.get_event_loop()
-    if loop.is_running():
+    try:
+        loop = asyncio.get_running_loop()
         loop.create_task(_capture())
-    else:
-        loop.run_until_complete(_capture())
+    except RuntimeError:
+        # No running loop in this thread → fire-and-forget with new loop
+        asyncio.run(_capture())
 
 
 @task_retry.connect
@@ -329,9 +330,9 @@ def persist_scored_leads(self) -> dict[str, Any]:
                     lead_id = event.get("id", str(uuid.uuid4()))
 
                     # Emit domain events
-                    emit("lead_created", {"id": lead_id, "source": event.get("source")})
-                    emit("lead_enriched", {"id": lead_id, "company_name": event.get("company_name")})
-                    emit("lead_scored", {"id": lead_id, "final_score": final_score, "score_band": event.get("score_band")})
+                    await emit("lead_created", {"id": lead_id, "source": event.get("source")})
+                    await emit("lead_enriched", {"id": lead_id, "company_name": event.get("company_name")})
+                    await emit("lead_scored", {"id": lead_id, "final_score": final_score, "score_band": event.get("score_band")})
 
                 await redis_stream.ack(stream, group, event.event_id)
             except Exception as exc:

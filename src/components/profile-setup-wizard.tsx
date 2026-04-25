@@ -251,7 +251,6 @@ export function ProfileSetupWizard({ open, onClose }: WizardProps) {
 
   function StepTarget() {
     const showProductFields = draft.mode === 'b2b_sales';
-    const showSkillFields   = draft.mode === 'job_search' || draft.mode === 'hiring';
 
     return (
       <div className="space-y-5">

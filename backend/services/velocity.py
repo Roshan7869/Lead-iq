@@ -86,7 +86,7 @@ class VelocityTracker:
             return []
         try:
             pattern = _KEY_PREFIX + "*"
-            keys    = await self._client.keys(pattern)
+            keys    = [k async for k in self._client.scan_iter(match=pattern)]
             cutoff  = time.time() - _WINDOW_SECS
             results = []
             for key in keys:

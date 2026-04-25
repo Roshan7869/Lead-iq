@@ -18,6 +18,8 @@ from backend.shared.config import settings
 from backend.shared.logging_config import configure_logging, get_logger
 from backend.shared.stream import redis_stream
 from backend.services.velocity import velocity_tracker
+from backend.shared.db import engine
+from sqlalchemy import text
 from backend.api import health
 from backend.api.routes import leads, stats, admin, profile, auth, mcp
 from backend.api.mcp_server import mcp_app
@@ -33,6 +35,14 @@ limiter = Limiter(key_func=get_remote_address, default_limits=[settings.RATE_LIM
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("leadiq_startup", version="2.0.0")
+    # Startup: verify DB connection first (Hussein Nasser - fail fast)
+    try:
+        async with engine.connect() as conn:
+            await conn.execute(text("SELECT 1"))
+        logger.info("db_connection_verified", port=6543, pool="NullPool")
+    except Exception as exc:
+        logger.error("db_startup_failed", error=str(exc))
+        raise  # HARD FAIL: don't start without DB
     # Startup: connect Redis stream bus + velocity tracker
     try:
         await redis_stream.connect()
@@ -45,7 +55,12 @@ async def lifespan(app: FastAPI):
     except Exception as exc:
         logger.warning("velocity_tracker_skipped", error=str(exc))
     yield
-    # Shutdown
+    # Shutdown: dispose DB engine cleanly
+    try:
+        await engine.dispose()
+        logger.info("db_engine_disposed")
+    except Exception:
+        pass
     try:
         await redis_stream.disconnect()
         await velocity_tracker.disconnect()

@@ -23,14 +23,14 @@ STREAMS = {
 }
 
 
-def emit(event_type: str, payload: dict, maxlen: int = 50_000):
+async def emit(event_type: str, payload: dict, maxlen: int = 50_000):
     """Emit domain event to Redis Stream"""
     if not _r:
         return
     stream = STREAMS.get(event_type)
     if not stream:
         raise ValueError(f"Unknown event type: {event_type}")
-    _r.xadd(stream, {
+    await _r.xadd(stream, {
         "event_type": event_type,
         "payload": json.dumps(payload),
         "emitted_at": datetime.now(timezone.utc).isoformat(),

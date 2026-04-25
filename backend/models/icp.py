@@ -12,7 +12,7 @@ from typing import Any
 from sqlalchemy import Column, DateTime, Float, String, Text
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
 
-from backend.shared.database import Base
+from backend.shared.db import Base
 
 
 class ICP(Base):

@@ -1,13 +1,13 @@
 # Lead-iq TODO — Updated Every Session
 
+## Current Status (2026-04-06)
+- Day 1 Morning Block: **COMPLETE** - GeminiAnalyzer, AnalyzedLead, SOURCE_PROMPTS
+- Day 1 Afternoon Block: **IN PROGRESS** - eval infrastructure ready, needs real extraction
+
 ## North Star Metrics (update daily)
 | Date | field_precision | email_validity | tokens_used | status |
 |------|----------------|----------------|-------------|--------|
-| 2026-04-04 | 10.26% | —% | 0 | BASELINE NEEDED - below 75% target |
-| 2026-04-04 | 10.26% | —% | 0 | AUDIT TRIAGE COMPLETE - SECURITY FIXES APPLIED |
-| 2026-04-04 | —% | —% | —% | WATERFALL ENRICHMENT IMPLEMENTED - Hunter/Clearbit/Gemini |
-| 2026-04-04 | —% | —% | —% | TEMPORAL DECAY + ICP SCORING IMPLEMENTED |
-| 2026-04-04 | —% | —% | —% | SESSION A-E COMPLETE: 64/100 → 97/100 (5 sessions) |
+| 2026-04-06 | 12.64% | —% | — | BASELINE (mock data) - below 75% target |
 
 ## Sprint Progress - COMPLETE (Days 0-6)
 - [x] DAY 0: eval/ground_truth.json (50 records)
@@ -81,7 +81,7 @@
 - [x] DAY 12: daily_report Celery beat task - IMPLEMENTED
 - [x] DAY 12: MCP server endpoint (/api/mcp/tools) - IMPLEMENTED
 - [x] DAY 13: /deploy-check → clean - ALREADY COMPLETE
-- [x] DAY 13: eval/run_eval.py with actual extraction integration - ALREADY COMPLETE
+- [x] DAY 13: eval/run_eval.py - INFRASTRUCTURE COMPLETE (needs real extraction data)
 
 ## Sprint to 90+ - Complete (5 Sessions, ~5 Hours Total)
 - [x] SESSION A: Hussein Nasser +9 points (port 6543, NullPool, Celery config)
@@ -98,23 +98,15 @@
 - **HIGH**: `intent_monitor.py` is empty stub - FIXED in audit triage
 - **MEDIUM**: LeadDLQ model created but integration into pipeline pending
 
-## Eval History
-| Commit | tracxn_prec | indimart_prec | github_prec | overall |
-|--------|-------------|---------------|-------------|---------|
-| baseline | — | — | — | — |
-| audit-2026-04-04 | — | — | — | security fixes applied |
-| sprint-2026-04-04 | — | — | — | 64/100 → 97/100 (5 sessions) |
+## Eval History (Baseline - Mock Data)
+| Date | field_precision | email_validity | overall | status |
+|------|----------------|----------------|---------|--------|
+| 2026-04-06 | 12.64% | —% | 12.64% | MOCK DATA BASELINE |
 
-## Projected Final Score: 97/100
-| Expert | Before | After | Points |
-|--------|--------|-------|--------|
-| Karpathy (AI Quality) | 17/20 | 17/20 | +0 |
-| Alex Xu (Scale) | 9/15 | 15/15 | +6 |
-| Hussein Nasser (Backend) | 1/10 | 10/10 | +9 |
-| Arpit Bhayani (DB) | 4/10 | 10/10 | +6 |
-| Gaurav Sen (Service Design) | 6/10 | 10/10 | +4 |
-| Mark Richards (Fitness) | 3/10 | 10/10 | +7 |
-| Security | 15/15 | 15/15 | +0 |
-| Data Moat | 9/10 | 10/10 | +1 |
-| Ops Bonus | 5/5 | 5/5 | +0 |
-| **TOTAL** | **64/100** | **97/100** | **+33** |
+## Day 1 Afternoon Block - In Progress
+| Task | Status | Notes |
+|------|--------|-------|
+| eval/ground_truth.json | ✅ DONE | 50 records across 5 sources |
+| eval/run_eval.py | ✅ DONE | Field-level precision script |
+| Connect to real extraction | 🔜 NEXT | Replace mock extraction with Gemini calls |
+| CI integration | 🔜 NEXT | Run eval after every prompt change |

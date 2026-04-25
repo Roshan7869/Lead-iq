@@ -9,7 +9,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { ExternalLink, Mail, Linkedin } from 'lucide-react';
+import { Mail, Linkedin } from 'lucide-react';
 
 export function LeadDetailModal() {
   const { selectedLead, setSelectedLead } = useLeads();
@@ -28,7 +28,10 @@ export function LeadDetailModal() {
             <div>
               <div className="flex items-center gap-2">
                 <span>{lead.name}</span>
-                <span>{PRIORITY_ICON[lead.priority]}</span>
+                <span>{(() => {
+                  const Icon = PRIORITY_ICON[lead.priority];
+                  return Icon ? <Icon className="w-5 h-5 inline" /> : null;
+                })()}</span>
               </div>
               <p className="text-sm text-muted-foreground font-normal">{lead.title} · {lead.company}</p>
             </div>

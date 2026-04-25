@@ -24,9 +24,16 @@ from sqlalchemy import (
     String,
     Text,
     UniqueConstraint,
+    ARRAY,
 )
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import relationship
+
+try:
+    from pgvector.sqlalchemy import Vector
+except ImportError:
+    # Fallback for environments without pgvector installed
+    Vector = None  # type: ignore
 
 from backend.shared.db import Base
 
@@ -67,6 +74,9 @@ class Lead(Base):
     id: str = Column(UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid.uuid4()))
     post_id: str = Column(UUID(as_uuid=False), ForeignKey("posts.id"), nullable=True, index=True)
 
+    # ── Embedding (pgvector) ─────────────────────────────────────────────────
+    embedding = Column(Vector(768), nullable=True) if Vector is not None else Column(Text, nullable=True)
+
     # ── Classification ───────────────────────────────────────────────────────
     is_opportunity: bool = Column(Boolean, default=False, nullable=False)
     confidence: float = Column(Float, default=0.0, nullable=False)        # 0.0–1.0
@@ -94,6 +104,13 @@ class Lead(Base):
     # ── Outreach ──────────────────────────────────────────────────────────────
     outreach_draft: str = Column(Text, nullable=True)
     outreach_sent_at: datetime = Column(DateTime(timezone=True), nullable=True)
+
+    # ── Evidence Trail (Amodei Safety) ────────────────────────────────────────
+    pain_point: str = Column(Text, nullable=True)           # exact phrase from source text
+    raw_excerpt: str = Column(Text, nullable=True)         # single sentence most driving classification
+
+    # ── India Market Signals (Lead-iq Moat) ──────────────────────────────────
+    india_signals: list = Column(ARRAY(String), nullable=True, default=[])  # e.g., ["Pvt Ltd", "IIT founder", "GST registered"]
 
     # ── Timestamps ───────────────────────────────────────────────────────────
     analyzed_at: datetime = Column(DateTime(timezone=True), nullable=True)

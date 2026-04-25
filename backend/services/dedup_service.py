@@ -22,7 +22,7 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.models.lead import Lead
+from backend.shared.models import Lead
 from backend.services.confidence import SOURCE_TRUST
 
 logger = structlog.get_logger()

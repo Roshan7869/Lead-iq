@@ -56,10 +56,10 @@ def _lead_to_dict(lead) -> dict[str, Any]:
 
 
 def _verify_mcp_api_key(api_key: str | None) -> bool:
-    """Check the MCP_API_KEY env var. If not set, allow all requests (dev mode)."""
+    """Check the MCP_API_KEY env var. Empty key is rejected."""
     expected = os.getenv("MCP_API_KEY", "")
     if not expected:
-        return True  # No key configured → dev mode, allow all
+        return False  # No key configured → reject all requests
     return api_key == expected
 
 

@@ -21,7 +21,10 @@ export function LeadCard({ lead, compact }: LeadCardProps) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-foreground truncate">{lead.name}</span>
-            <span className="text-sm">{PRIORITY_ICON[lead.priority]}</span>
+            <span className="text-sm">{(() => {
+              const Icon = PRIORITY_ICON[lead.priority];
+              return Icon ? <Icon className="w-4 h-4 inline" /> : null;
+            })()}</span>
           </div>
           <p className="text-sm text-muted-foreground truncate">{lead.title} · {lead.company}</p>
           {!compact && (

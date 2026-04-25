@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str  # Must be set via environment variable in production
 
     # ── PostgreSQL ────────────────────────────────────────────────────────────
-    DATABASE_URL: str = "postgresql+asyncpg://leadiq:leadiq@localhost:5432/leadiq"
+    DATABASE_URL: str
 
     # ── Redis ─────────────────────────────────────────────────────────────────
     REDIS_URL: str = "redis://localhost:6379"
@@ -68,7 +68,7 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 480       # 8 hours
     JWT_REFRESH_TOKEN_EXPIRE_DAYS: int = 30
-    ADMIN_USERNAME: str = "admin"
+    ADMIN_USERNAME: str
     ADMIN_PASSWORD: str  # Must be set via environment variable in production
 
     # ── Rate limiting ─────────────────────────────────────────────────────────

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import sys
 from asyncio import run
 from logging.config import fileConfig
 
@@ -9,8 +10,11 @@ from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
+# Add the backend directory to the path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from backend.shared.db import Base
-from backend.shared.models import Post, Lead, Feedback, QuotaUsage  # noqa: F401
+from backend.shared.models import Post, Lead, Feedback, QuotaUsage, UserProfile  # noqa: F401
 
 config = context.config
 if config.config_file_name is not None:

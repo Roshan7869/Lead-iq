@@ -127,10 +127,12 @@ export const SOURCE_CONFIG: Record<string, { label: string; icon: string }> = {
   rss:          { label: 'RSS / Blog',    icon: 'Rss' },
 };
 
-export const PRIORITY_ICON: Record<LeadPriority, string> = {
-  hot:  'Flame',
-  warm: 'Sun',
-  cold: 'Snowflake',
+import { Flame, Sun, Snowflake, type LucideIcon } from 'lucide-react';
+
+export const PRIORITY_ICON: Record<LeadPriority, LucideIcon> = {
+  hot:  Flame,
+  warm: Sun,
+  cold: Snowflake,
 };
 
 export const SCORE_BAND_CONFIG: Record<ScoreBand, { label: string; color: string }> = {

@@ -8,7 +8,7 @@ from __future__ import annotations
 from fastapi import APIRouter
 from sqlalchemy import func, select
 
-from backend.api.deps import DbSession, StreamClient
+from backend.api.deps import CurrentUser, DbSession, StreamClient
 from backend.api.schemas import PipelineStatsResponse, StageCount
 from backend.shared.config import settings
 from backend.shared.models import Lead
@@ -17,7 +17,11 @@ router = APIRouter(prefix="/api/stats", tags=["stats"])
 
 
 @router.get("/pipeline", response_model=PipelineStatsResponse)
-async def pipeline_stats(session: DbSession, stream: StreamClient) -> PipelineStatsResponse:
+async def pipeline_stats(
+    session: DbSession,
+    stream: StreamClient,
+    user: CurrentUser,
+) -> PipelineStatsResponse:
     # Lead counts
     total_result = await session.execute(select(func.count(Lead.id)))
     total = total_result.scalar() or 0

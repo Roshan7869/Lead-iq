@@ -19,6 +19,7 @@ Usage:
 """
 from __future__ import annotations
 
+import asyncio
 import json
 import structlog
 from typing import Any
@@ -30,6 +31,20 @@ from backend.llm.SOURCE_PROMPTS import SOURCE_PROMPTS, get_generic_prompt
 from backend.shared.config import settings
 
 logger = structlog.get_logger()
+
+
+class GeminiExtractionError(Exception):
+    """Raised when Gemini extraction fails irrecoverably."""
+    def __init__(
+        self,
+        message: str,
+        source: str | None = None,
+        url: str | None = None,
+    ):
+        super().__init__(message)
+        self.source = source
+        self.url = url
+
 
 # ── Model Configuration ────────────────────────────────────────────────────────
 
@@ -107,7 +122,8 @@ Content:
 
     try:
         model = GenerativeModel(MODELS["extract"])
-        response = model.generate_content(
+        response = await asyncio.to_thread(
+            model.generate_content,
             full_prompt,
             generation_config=GenerationConfig(
                 response_mime_type="application/json",
@@ -136,11 +152,15 @@ Content:
 
     except json.JSONDecodeError as exc:
         logger.error("gemini_json_parse_error", source=source, error=str(exc))
-        return {"error": "json_parse_error", "source": source, "source_url": url}
+        raise GeminiExtractionError(
+            f"JSON parse error: {exc}", source=source, url=url
+        ) from exc
 
     except Exception as exc:
         logger.error("gemini_extraction_error", source=source, error=str(exc))
-        return {"error": str(exc), "source": source, "source_url": url}
+        raise GeminiExtractionError(
+            f"Extraction failed: {exc}", source=source, url=url
+        ) from exc
 
 
 async def regex_fallback_extract(
@@ -205,12 +225,12 @@ async def get_embedding(text: str) -> list[float] | None:
 
     try:
         model = TextEmbeddingModel.from_pretrained(MODELS["embed"])
-        embeddings = model.get_embeddings([text[:8192]])  # 8K char limit
+        embeddings = await asyncio.to_thread(model.get_embeddings, [text[:8192]])  # 8K char limit
         return list(embeddings[0].values)
 
     except Exception as exc:
         logger.error("embedding_error", error=str(exc))
-        return None
+        raise GeminiExtractionError(f"Embedding failed: {exc}") from exc
 
 
 # ── Vision Extraction ────────────────────────────────────────────────────────────
@@ -239,7 +259,8 @@ async def extract_from_image(
         model = GenerativeModel(MODELS["vision"])
         image_part = Part.from_data(image_bytes, mime_type=mime_type)
 
-        response = model.generate_content(
+        response = await asyncio.to_thread(
+            model.generate_content,
             [image_part, instruction],
             generation_config=GenerationConfig(
                 response_mime_type="application/json",
@@ -252,7 +273,7 @@ async def extract_from_image(
 
     except Exception as exc:
         logger.error("vision_extraction_error", error=str(exc))
-        return {}
+        raise GeminiExtractionError(f"Vision extraction failed: {exc}") from exc
 
 
 # ── ICP Parser ───────────────────────────────────────────────────────────────────
@@ -305,7 +326,8 @@ Rules:
 
     try:
         model = GenerativeModel(MODELS["score"])  # Use flash for reasoning
-        response = model.generate_content(
+        response = await asyncio.to_thread(
+            model.generate_content,
             prompt,
             generation_config=GenerationConfig(
                 response_mime_type="application/json",
@@ -317,7 +339,7 @@ Rules:
 
     except Exception as exc:
         logger.error("icp_parse_error", error=str(exc))
-        return {}
+        raise GeminiExtractionError(f"ICP parse failed: {exc}") from exc
 
 
 # ── Confidence Computation ──────────────────────────────────────────────────────
@@ -338,7 +360,7 @@ def compute_confidence(lead: dict[str, Any], source: str) -> float:
         - indimart: 0.50 (user-submitted B2B directory, often stale)
         - llm_web_scrape: 0.40 (generic LLM extraction, needs validation)
     """
-    from backend.llm.confidence import SOURCE_TRUST, FIELD_WEIGHTS, compute_field_score
+    from backend.services.confidence import SOURCE_TRUST, FIELD_WEIGHTS, compute_field_score
 
     source_trust = SOURCE_TRUST.get(source, 0.40)
     field_score = compute_field_score(lead)

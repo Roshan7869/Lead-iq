@@ -6,21 +6,21 @@ import { Text } from '@/components/ui/text';
 import { SmartLabel } from '@/components/ui/smart-label';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { 
-  Flame, 
-  Sun, 
-  Snowflake, 
-  Share2, 
-  Linkedin, 
-  Twitter, 
-  Zap, 
-  Cpu, 
+import {
+  Flame,
+  Sun,
+  Snowflake,
+  Share2,
+  Linkedin,
+  Twitter,
+  Zap,
+  Cpu,
   User,
   Lightbulb,
   Handshake,
-  Target
+  Target,
+  type LucideIcon,
 } from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
 
 interface EnhancedLeadCardProps {
   lead: Lead;
@@ -28,8 +28,13 @@ interface EnhancedLeadCardProps {
   showActions?: boolean;
 }
 
-const getLucideIcon = (name: string) => {
-  const Icon = (LucideIcons as any)[name];
+const ICON_REGISTRY: Record<string, LucideIcon> = {
+  Flame, Sun, Snowflake, Share2, Linkedin, Twitter, Zap, Cpu,
+  User, Lightbulb, Handshake, Target,
+};
+
+const getLucideIcon = (name: string): React.ReactElement | null => {
+  const Icon = ICON_REGISTRY[name];
   return Icon ? <Icon className="w-4 h-4" /> : null;
 };
 
@@ -67,9 +72,10 @@ export function EnhancedLeadCard({ lead, compact = false, showActions = true }: 
             <Text variant="h6" className="truncate group-hover:text-primary transition-colors">
               {lead.name}
             </Text>
-            <span className="text-muted-foreground flex-shrink-0">
-              {getLucideIcon(PRIORITY_ICON[lead.priority])}
-            </span>
+            <span className="text-muted-foreground flex-shrink-0">{(() => {
+              const Icon = PRIORITY_ICON[lead.priority];
+              return Icon ? <Icon className="w-4 h-4" /> : null;
+            })()}</span>
           </div>
           
           <Text variant="xs" color="muted" className="truncate block">

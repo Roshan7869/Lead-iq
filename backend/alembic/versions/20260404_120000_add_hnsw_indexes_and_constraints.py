@@ -35,6 +35,7 @@ def upgrade() -> None:
     ''')
 
     # HNSW index — better than IVFFlat for most use cases
+    op.execute("COMMIT")
     op.execute('''
         CREATE INDEX CONCURRENTLY IF NOT EXISTS leads_embedding_hnsw_idx
         ON leads USING hnsw (embedding vector_cosine_ops)
@@ -42,19 +43,23 @@ def upgrade() -> None:
     ''')
 
     # Composite indexes for dashboard query patterns
+    op.execute("COMMIT")
     op.execute('''
-        CREATE INDEX CONCURRENTLY IF NOT EXISTS ix_lead_status_created
-        ON leads (status, created_at DESC)
+        CREATE INDEX CONCURRENTLY IF NOT EXISTS ix_lead_stage_created
+        ON leads (stage, created_at DESC)
     ''')
+    op.execute("COMMIT")
     op.execute('''
-        CREATE INDEX CONCURRENTLY IF NOT EXISTS ix_lead_icp_status
-        ON leads (icp_score DESC, status)
-        WHERE icp_score IS NOT NULL
+        CREATE INDEX CONCURRENTLY IF NOT EXISTS ix_lead_icp_stage
+        ON leads (icp_fit_score DESC, stage)
+        WHERE icp_fit_score IS NOT NULL
     ''')
+    op.execute("COMMIT")
     op.execute('''
-        CREATE INDEX CONCURRENTLY IF NOT EXISTS ix_lead_source_created
-        ON leads (source, created_at DESC)
+        CREATE INDEX CONCURRENTLY IF NOT EXISTS ix_lead_post_created
+        ON leads (post_id, created_at DESC)
     ''')
+    op.execute("COMMIT")
     op.execute('''
         CREATE INDEX CONCURRENTLY IF NOT EXISTS ix_lead_final_score
         ON leads (final_score DESC)
@@ -84,8 +89,8 @@ def upgrade() -> None:
             ) THEN
                 ALTER TABLE leads
                 ADD CONSTRAINT ck_lead_icp_score_range
-                CHECK (icp_score IS NULL OR
-                       (icp_score >= 0.0 AND icp_score <= 1.0));
+                CHECK (icp_fit_score IS NULL OR
+                       (icp_fit_score >= 0.0 AND icp_fit_score <= 100.0));
             END IF;
         END $$
     ''')
@@ -93,9 +98,9 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     op.execute("DROP INDEX CONCURRENTLY IF EXISTS leads_embedding_hnsw_idx")
-    op.execute("DROP INDEX CONCURRENTLY IF EXISTS ix_lead_status_created")
-    op.execute("DROP INDEX CONCURRENTLY IF EXISTS ix_lead_icp_status")
-    op.execute("DROP INDEX CONCURRENTLY IF EXISTS ix_lead_source_created")
+    op.execute("DROP INDEX CONCURRENTLY IF EXISTS ix_lead_stage_created")
+    op.execute("DROP INDEX CONCURRENTLY IF EXISTS ix_lead_icp_stage")
+    op.execute("DROP INDEX CONCURRENTLY IF EXISTS ix_lead_post_created")
     op.execute("DROP INDEX CONCURRENTLY IF EXISTS ix_lead_final_score")
     op.execute("ALTER TABLE leads DROP CONSTRAINT IF EXISTS ck_lead_confidence_range")
     op.execute("ALTER TABLE leads DROP CONSTRAINT IF EXISTS ck_lead_icp_score_range")

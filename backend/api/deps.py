@@ -24,13 +24,17 @@ from backend.services.auth import verify_token
 # ── DB session ────────────────────────────────────────────────────────────────
 
 async def _get_db() -> AsyncGenerator[AsyncSession, None]:
-    async with AsyncSessionLocal() as session:
-        try:
+    """Yield a DB session, handling connection failures gracefully."""
+    session: AsyncSession | None = None
+    try:
+        session = AsyncSessionLocal()
+        async with session:
             yield session
             await session.commit()
-        except Exception:
+    except Exception:
+        if session:
             await session.rollback()
-            raise
+        raise
 
 
 DbSession = Annotated[AsyncSession, Depends(_get_db)]
@@ -85,4 +89,3 @@ async def _get_optional_user(
 
 CurrentUser    = Annotated[str, Depends(_get_current_user)]
 OptionalUser   = Annotated[str | None, Depends(_get_optional_user)]
-

@@ -88,13 +88,7 @@ def _register_actor_tasks(celery_app_instance):
             return await collector.collect_profile(username, settings.STREAM_COLLECTED)
 
         try:
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                return loop.run_until_complete(_run())
-            else:
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-                return loop.run_until_complete(_run())
+            return asyncio.run(_run())
         except Exception as exc:
             logger.error("collect_github_failed", username=username, error=str(exc))
             raise self.retry(exc=exc)
@@ -127,13 +121,7 @@ def _register_actor_tasks(celery_app_instance):
             return {"status": "queued", "count": len(usernames)}
 
         try:
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                return loop.run_until_complete(_run())
-            else:
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-                return loop.run_until_complete(_run())
+            return asyncio.run(_run())
         except Exception as exc:
             logger.error("search_github_india_failed", error=str(exc))
             raise self.retry(exc=exc)
@@ -160,13 +148,7 @@ def _register_actor_tasks(celery_app_instance):
             return await collector.run_all(settings.STREAM_COLLECTED)
 
         try:
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                return loop.run_until_complete(_run())
-            else:
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-                return loop.run_until_complete(_run())
+            return asyncio.run(_run())
         except Exception as exc:
             logger.error("monitor_telegram_failed", error=str(exc))
             raise self.retry(exc=exc)

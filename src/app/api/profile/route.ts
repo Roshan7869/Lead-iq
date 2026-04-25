@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
         const data = await res.json();
         return NextResponse.json(data);
       }
-    } catch {}
+    } catch { /* backend unavailable — return defaults */ }
   }
   // Fallback: return default profile shape
   return NextResponse.json({
@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
         const data = await res.json();
         return NextResponse.json(data);
       }
-    } catch {}
+    } catch { /* backend unavailable — acknowledge locally */ }
   }
   // Acknowledge locally (frontend persists to localStorage too)
   return NextResponse.json({ ...body, id: 1, updated_at: new Date().toISOString() });

@@ -51,23 +51,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // On mount: check stored token; attempt silent refresh if expired
   useEffect(() => {
+    let cancelled = false;
     async function init() {
-      if (isAuthenticated()) {
-        setUsername(decodeUsername(getAccessToken()));
-        setIsLoading(false);
-        return;
+      try {
+        if (isAuthenticated()) {
+          if (!cancelled) {
+            setUsername(decodeUsername(getAccessToken()));
+          }
+          return;
+        }
+        // Try silent refresh
+        const refreshed = await refreshRequest();
+        if (!cancelled) {
+          if (refreshed) {
+            setUsername(decodeUsername(refreshed.access_token));
+          } else {
+            clearTokens();
+            setUsername(null);
+          }
+        }
+      } catch (err) {
+        if (!cancelled) {
+          console.error('Auth init failed:', err);
+          clearTokens();
+          setUsername(null);
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
       }
-      // Try silent refresh
-      const refreshed = await refreshRequest();
-      if (refreshed) {
-        setUsername(decodeUsername(refreshed.access_token));
-      } else {
-        clearTokens();
-        setUsername(null);
-      }
-      setIsLoading(false);
     }
     init();
+    return () => { cancelled = true; };
   }, []);
 
   const login = useCallback(async (user: string, password: string) => {

@@ -6,12 +6,11 @@ const BACKEND = process.env.NEXT_PUBLIC_API_URL ?? "";
 export async function GET(req: NextRequest) {
   // Try real backend first — fall back to demo data gracefully
   const auth = req.headers.get("authorization");
-  const authHeader = auth ? { Authorization: auth } : {};
   if (BACKEND) {
     try {
       const res = await fetch(`${BACKEND}/api/leads?limit=200`, {
         cache: "no-store",
-        headers: authHeader,
+        headers: auth ? { Authorization: auth } : undefined,
       });
       if (res.ok) {
         const data = await res.json();
@@ -19,7 +18,7 @@ export async function GET(req: NextRequest) {
           return NextResponse.json(data);
         }
       }
-    } catch {}
+    } catch { /* backend unavailable — fall back to demo */ }
   }
   return NextResponse.json({ leads: demoLeads });
 }

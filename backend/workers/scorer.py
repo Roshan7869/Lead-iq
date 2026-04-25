@@ -178,7 +178,7 @@ async def run_scorer(consumer_name: str = "scorer-1") -> None:
                 # Emit domain event
                 from backend.events.emitter import emit
                 lead_id = event.get("id", str(uuid.uuid4()))
-                emit("lead_scored", {
+                await emit("lead_scored", {
                     "id": lead_id,
                     "final_score": result.final_score,
                     "score_band": result.score_band,

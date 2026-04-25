@@ -29,3 +29,21 @@ out/
 .env
 
 .vercel
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+*.egg-info/
+
+# Generated / local
+eval/results.json
+audit_*.json
+AUDIT_*.md
+CHECKPOINT_*.md
+ROADMAP.md
+
+# Virtual environments
+venv/
+.env

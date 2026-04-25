@@ -12,8 +12,8 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import Column, DateTime, Enum, Integer, JSONB, String, Text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, DateTime, Enum, Integer, String, Text
+from sqlalchemy.dialects.postgresql import UUID, JSONB
 
 from backend.shared.db import Base
 

@@ -26,6 +26,8 @@ import math
 from datetime import UTC, datetime
 from typing import Any
 
+from backend.api.schemas import LeadOut, PersonalizedLeadOut
+
 
 # ── Operation Modes ───────────────────────────────────────────────────────────
 
@@ -433,6 +435,62 @@ def compute_personalized_score(
         "feedback_bonus":     round(fb_bonus, 1),
         "velocity_bonus":     round(vel_bonus, 1),
     }
+
+
+# ── Personalized Lead Builder ─────────────────────────────────────────────────
+
+async def build_personalized_results(
+    leads: list[Any],
+    profile_data: dict[str, Any],
+    velocity_map: dict[str, int],
+    limit: int = 50,
+) -> list[PersonalizedLeadOut]:
+    """
+    Score and rank leads using profile fit, temporal decay, keywords,
+    feedback learning, and cross-source velocity.
+    """
+    exclude_kw: list[str] = profile_data.get("exclude_keywords", [])
+    result: list[PersonalizedLeadOut] = []
+
+    for lead in leads:
+        signal_text = " ".join(filter(None, [
+            lead.company_name, lead.industry, lead.intent,
+            getattr(lead, "post", None) and getattr(lead.post, "body", None) or "",
+        ]))
+        if exclude_kw and not passes_keyword_filter(signal_text, exclude_kw):
+            continue
+
+        collected_iso = (
+            lead.created_at.isoformat()
+            if lead.created_at
+            else datetime.now(UTC).isoformat()
+        )
+        cross_source_count = velocity_map.get(lead.company_name or "", 0)
+
+        breakdown = compute_personalized_score(
+            base_final_score=lead.final_score,
+            collected_at_iso=collected_iso,
+            industry=lead.industry,
+            company_size=lead.company_size,
+            intent=lead.intent or "other",
+            text_for_keywords=signal_text,
+            profile_data=profile_data,
+            cross_source_count=cross_source_count,
+        )
+
+        base_out = LeadOut.model_validate(lead)
+        result.append(PersonalizedLeadOut(
+            **base_out.model_dump(),
+            personalized_score=breakdown["personalized_score"],
+            temporal_decay=breakdown["temporal_decay"],
+            profile_fit=breakdown["profile_fit"],
+            keyword_bonus=breakdown["keyword_bonus"],
+            feedback_bonus=breakdown["feedback_bonus"],
+            velocity_bonus=breakdown["velocity_bonus"],
+        ))
+
+    result.sort(key=lambda x: x.personalized_score, reverse=True)
+    return result[:limit]
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────

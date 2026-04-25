@@ -205,7 +205,7 @@ async def refresh_intent_signals(limit: int = 10) -> None:
 
                 # Emit domain event
                 from backend.events.emitter import emit
-                emit("signal_detected", {
+                await emit("signal_detected", {
                     "lead_id": str(lead.id),
                     "company": lead.company_name,
                     "signals": signals,

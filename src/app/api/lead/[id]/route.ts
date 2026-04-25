@@ -10,11 +10,28 @@ const LeadUpdateSchema = z.object({
   notes: z.string().max(2000).optional(),
 });
 
+const BACKEND = process.env.NEXT_PUBLIC_API_URL ?? "";
+
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+
+  // Try real backend first
+  if (BACKEND) {
+    try {
+      const res = await fetch(`${BACKEND}/api/lead/${id}`, {
+        cache: "no-store",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return NextResponse.json(data);
+      }
+    } catch { /* backend unavailable — fall back to demo */ }
+  }
+
+  // Fallback to demo data
   const lead = demoLeads.find((l) => l.id === id);
   if (!lead) {
     return NextResponse.json({ error: "Lead not found" }, { status: 404 });
@@ -43,6 +60,32 @@ export async function PATCH(
     );
   }
 
+  // Forward to real backend
+  if (BACKEND) {
+    const auth = request.headers.get("authorization");
+    try {
+      const res = await fetch(`${BACKEND}/api/lead/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          ...(auth ? { Authorization: auth } : {}),
+        },
+        body: JSON.stringify(parsed.data),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return NextResponse.json(data);
+      }
+      return NextResponse.json(
+        { error: "Backend error", status: res.status },
+        { status: res.status }
+      );
+    } catch {
+      // Fallback to demo on backend failure
+    }
+  }
+
+  // Demo fallback
   const lead = demoLeads.find((l) => l.id === id);
   if (!lead) {
     return NextResponse.json({ error: "Lead not found" }, { status: 404 });

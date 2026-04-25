@@ -19,8 +19,8 @@ interface ProfileContextType {
   profile: UserProfile;
   isSetupComplete: boolean;
   isSaving: boolean;
-  saveProfile: (updates: Partial<UserProfile>) => Promise<void>;
-  setMode: (mode: OperationMode) => Promise<void>;
+  saveProfile: (updates: Partial<UserProfile>) => Promise<{ success: boolean; error?: string }>;
+  setMode: (mode: OperationMode) => Promise<{ success: boolean; error?: string }>;
 }
 
 const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
@@ -32,14 +32,14 @@ function loadFromStorage(): UserProfile {
   try {
     const raw = localStorage.getItem(PROFILE_STORAGE_KEY);
     if (raw) return { ...DEFAULT_PROFILE, ...JSON.parse(raw) };
-  } catch {}
+  } catch { /* ignore parse error */ }
   return DEFAULT_PROFILE;
 }
 
 function saveToStorage(profile: UserProfile): void {
   try {
     localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile));
-  } catch {}
+  } catch { /* ignore storage error */ }
 }
 
 // ── Backend sync (best-effort) ────────────────────────────────────────────────
@@ -102,26 +102,34 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
 
   // On mount: try to hydrate from backend (more up-to-date than localStorage)
   useEffect(() => {
+    let cancelled = false;
     loadFromBackend().then((remote) => {
-      if (remote && remote.mode) {
+      if (!cancelled && remote && remote.mode) {
         setProfileState((prev) => ({ ...prev, ...remote }));
       }
     });
+    return () => { cancelled = true; };
   }, []);
 
-  const saveProfile = useCallback(async (updates: Partial<UserProfile>) => {
+  const saveProfile = useCallback(async (updates: Partial<UserProfile>): Promise<{ success: boolean; error?: string }> => {
     setIsSaving(true);
     const next = { ...profile, ...updates };
     setProfileState(next);
     saveToStorage(next);
     try {
       await syncToBackend(next);
-    } catch {}
-    setIsSaving(false);
+      return { success: true };
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to save profile';
+      console.error('Profile save failed:', message);
+      return { success: false, error: message };
+    } finally {
+      setIsSaving(false);
+    }
   }, [profile]);
 
-  const setMode = useCallback(async (mode: OperationMode) => {
-    await saveProfile({ mode });
+  const setMode = useCallback(async (mode: OperationMode): Promise<{ success: boolean; error?: string }> => {
+    return await saveProfile({ mode });
   }, [saveProfile]);
 
   const isSetupComplete =

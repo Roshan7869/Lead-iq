@@ -9,6 +9,8 @@ from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import Any
 
+import structlog
+
 
 @dataclass
 class IngestionMetrics:
@@ -68,6 +70,9 @@ class IngestionMetrics:
         self.end_time = datetime.now()
 
 
+logger = structlog.get_logger("ingestion.metrics")
+
+
 class MetricsLogger:
     """Logger for ingestion metrics with integration to external services."""
 
@@ -88,8 +93,7 @@ class MetricsLogger:
         m = metrics or self._metrics
         log_data = m.to_dict()
 
-        # Log to stdout (for production logging, this goes to structlog)
-        print(f"INGESTION_COMPLETE: {log_data}")
+        logger.info("ingestion_complete", **log_data)
 
         # Publish to Sentry if available
         try:
