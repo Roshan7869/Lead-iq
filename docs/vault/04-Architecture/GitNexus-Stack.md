@@ -157,14 +157,14 @@ profile.py routes → get_personalized_leads → personalization.py
 **Graph Nodes:** 44 | **Issues Found:** 6 | **Central Hub**
 
 ### Components
-| Component | File | Graph Node ID | Purpose |
-|-----------|------|---------------|---------|
-| Gemini Service | `llm/gemini_service.py` | `llm:gemini` | Extraction, embeddings, vision |
-| Cost Guard | `llm/cost_guard.py` | `llm:cost_guard` | Budget enforcement |
-| Circuit Breaker | `llm/circuit_breaker.py` | `llm:circuit` | Resilience |
-| Source Prompts | `llm/SOURCE_PROMPTS.py` | `llm:prompts` | 8 source-specific prompts |
-| Schemas | `llm/schemas.py` | `llm:schemas` | AnalyzedLead Pydantic model |
-| ICP Parser | `llm/gemini_service.py:parse_nl_icp` | `llm:icp_parser` | Natural language → structured |
+| Component | File | Graph Node ID | Purpose | Status |
+|-----------|------|---------------|---------|--------|
+| Gemini Service | `llm/gemini_service.py` | `llm:gemini` | Extraction, embeddings, vision | ✅ Fixed |
+| Cost Guard | `llm/cost_guard.py` | `llm:cost_guard` | Budget enforcement | ✅ OK |
+| Circuit Breaker | `llm/circuit_breaker.py` | `llm:circuit` | Resilience | ✅ OK |
+| Source Prompts | `llm/SOURCE_PROMPTS.py` | `llm:prompts` | 8 source-specific prompts | 🔴 Phase 6 |
+| Schemas | `llm/schemas.py` | `llm:schemas` | AnalyzedLead Pydantic model | ✅ Fixed |
+| ICP Parser | `llm/gemini_service.py:parse_nl_icp` | `llm:icp_parser` | Natural language → structured | ✅ OK |
 
 ### Dependency Graph (Blast Radius)
 ```
@@ -191,7 +191,8 @@ gemini_service.py (16 dependent edges)
 ### Remediation
 - [[CRIT-003]] Fix broken confidence import ✅
 - [[CRIT-004]] Wrap sync calls in asyncio.to_thread() ✅
-- [[HIGH-035]] Raise GeminiExtractionError instead of error dict
+- [[HIGH-035]] Raise GeminiExtractionError instead of error dict ✅
+- [[Phase-6-Data-Quality-LLM-Prompts]] 🔴 ACTIVE — Raise field_precision from 12.64% to >75%
 
 ---
 

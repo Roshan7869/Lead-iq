@@ -1,14 +1,14 @@
 ---
-type: wiki
-domain: llm
-layers: 5
-files: 6
-total_lines: 1277
+version: 2.0
+phase: 6
+updated: 2026-04-25
 ---
 
 # LLM Wiki — Lead-iq Intelligence Layer Documentation
 
 > "The brain of the operation. Every lead passes through here."
+> 
+> **Current Status:** Phase 6 active. Field precision at 12.64%, targeting >75%.
 
 ## Wiki Map
 
@@ -32,11 +32,11 @@ total_lines: 1277
 ```
 backend/llm/
 ├── __init__.py          # Exports check_budget, get_budget_status
-├── gemini_service.py    # 349 lines — Core extraction, embeddings, vision, ICP
-├── cost_guard.py        # 142 lines — Redis-based daily budget (2M tokens)
-├── SOURCE_PROMPTS.py    # 540 lines — 8 source-specific prompts + India signals
-├── schemas.py           # 194 lines — AnalyzedLead Pydantic v2 model
-└── circuit_breaker.py   # 49 lines — Redis-backed circuit breaker
+├── gemini_service.py    # Core extraction, embeddings, vision, ICP
+├── cost_guard.py        # Redis-based daily budget (2M tokens)
+├── SOURCE_PROMPTS.py    # 8 source-specific prompts + India signals
+├── schemas.py           # AnalyzedLead Pydantic v2 model
+└── circuit_breaker.py   # Redis-backed circuit breaker
 ```
 
 ### Model Hierarchy
@@ -79,8 +79,8 @@ async def extract_lead(
 
 **Error Handling:**
 - Budget exceeded → fallback to regex extraction
-- JSON parse error → return `{"error": "json_parse_error"}`
-- API error → return `{"error": str(exc)}`
+- JSON parse error → raise `GeminiExtractionError` (HIGH-035 fixed)
+- API error → raise `GeminiExtractionError` with context
 
 #### `get_embedding()` — Semantic Search
 ```python
@@ -139,13 +139,6 @@ async def reset_budget() -> None
 | `gemini_service.py` | `parse_natural_language_icp()` | 283 |
 | `workers/analyzer.py` | `GeminiAnalyzer.analyze()` | 301 |
 
-### Architecture Fitness Test
-```python
-# tests/architecture/test_fitness_functions.py
-def test_gemini_calls_guarded_by_cost_check():
-    # Asserts every generate_content/get_embedding is preceded by check_budget
-```
-
 ---
 
 ## Source Prompts
@@ -187,6 +180,15 @@ INDIA_SIGNALS_LOOKUP: dict[str, dict[str, list[str]]]
 # Maps source → domain → signal keywords
 # e.g., "yourstory" → "fintech" → ["Razorpay", "PhonePe"]
 ```
+
+### Phase 6 Improvements
+**Status:** IN PROGRESS — See [[Phase-6-Data-Quality-LLM-Prompts]]
+
+Planned enhancements:
+- Add 2-3 few-shot examples per source
+- Add structured schema injection in prompts
+- Add Pydantic `model_validate_json()` enforcement
+- Improve regex fallback with source-specific patterns
 
 ---
 
@@ -306,7 +308,7 @@ calculate_field_precision(extracted, expected) -> (precision_score, field_matche
 ### Targets
 | Metric | Target | Current |
 |--------|--------|---------|
-| Overall precision | >75% | 12.64% (mock data) |
+| Overall precision | >75% | 12.64% ⚠️ |
 | Per-source | >=70% | — |
 | Per-field | >=75% | — |
 
@@ -316,6 +318,22 @@ python eval/run_eval.py
 # Exit code: 0 = pass, 1 = fail
 ```
 
+### Phase 6 Focus
+**Current precision breakdown:**
+- github_profile: 15.71%
+- producthunt: 15.71%
+- hacker_news: 15.00%
+- tracxn: 8.75%
+- yourstory: 8.00%
+
+**Worst fields:**
+- company_name: 0.00%
+- industry: 0.00%
+- tech_stack: 0.00%
+- email: 0.00%
+
+See [[Phase-6-Data-Quality-LLM-Prompts]] for remediation plan.
+
 ---
 
 ## Error Handling
@@ -324,8 +342,8 @@ python eval/run_eval.py
 | Failure | Handler | Fallback |
 |---------|---------|----------|
 | Budget exceeded | `cost_guard.py` | Regex extraction |
-| JSON parse error | `gemini_service.py` | Error dict with `"error"` key |
-| API error | `gemini_service.py` | Error dict |
+| JSON parse error | `gemini_service.py` | Raise `GeminiExtractionError` |
+| API error | `gemini_service.py` | Raise `GeminiExtractionError` |
 | Circuit open | `circuit_breaker.py` | Heuristic classification |
 | Redis down | `cost_guard.py` | Fail-open (allow call) |
 | Analyzer crash | `analyzer.py` | Heuristic classify |
@@ -367,8 +385,9 @@ python eval/run_eval.py
 - [[The-Forge]] — Memory Palace room
 - [[CRIT-003]] — Recent fix: broken confidence import
 - [[CRIT-004]] — Recent fix: sync blocking calls
-- [[HIGH-035]] — Pending: GeminiExtractionError
+- [[HIGH-035]] — Fixed: GeminiExtractionError
+- [[Phase-6-Data-Quality-LLM-Prompts]] — Active remediation phase
 
 ---
 
-*Wiki generated from code-review-graph analysis: 44 LLM nodes, 5 calling files, 6 internal functions.*
+*Wiki updated: 2026-04-25. Next update after Phase 6 eval improvements.*

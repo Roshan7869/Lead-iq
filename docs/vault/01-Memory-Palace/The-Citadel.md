@@ -63,12 +63,14 @@ Walk through each room to explore a domain. Each room contains artifacts (issues
 - [[Dependency-Graph]] — Visual map of all imports and calls
 - [[Data-Flow-Pipeline]] — Collection → Analysis → Scoring → Persistence
 - [[Celery-Task-Topology]] — Task chains and beat schedule
+- [[GitNexus-Stack]] — 7-layer remediation architecture
+- [[Autopilot-Prompt]] — Autonomous execution rules
 
 ## The Chronicle
-- [[2026-04-25]] — Audit completed, vault established, Phase 1 & Phase 2 resolved
+- [[2026-04-25]] — Audit completed, vault established, Phase 1–5 resolved
 
 ## Active Phase
-→ [[Phase-6-Data-Quality-LLM-Prompts]] — Raise field_precision to >75%, audit SOURCE_PROMPTS, address remaining 55 issues
+→ [[Phase-6-Data-Quality-LLM-Prompts]] — Raise field_precision to >75%, audit SOURCE_PROMPTS
 
 ## Resources
 - [[FastAPI-Patterns]]
@@ -76,3 +78,4 @@ Walk through each room to explore a domain. Each room contains artifacts (issues
 - [[Celery-Async-Recipes]]
 - [[React-Query-Migration-Guide]]
 - [[TypeScript-Strict-Migration]]
+- [[LLM-Wiki]] — LLM Intelligence Layer documentation
