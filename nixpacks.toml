@@ -3,9 +3,10 @@ nixPkgs = ["python312", "python312Packages.pip", "python312Packages.setuptools"]
 
 [phases.install]
 commands = [
-  "cd backend && pip install -r requirements.txt --no-cache-dir",
-  "pip install scrapling[fetchers] --no-cache-dir",
+  "python3 -m venv /app/.venv",
+  "/app/.venv/bin/pip install -r backend/requirements.txt --no-cache-dir",
+  "/app/.venv/bin/pip install scrapling[fetchers] --no-cache-dir",
 ]
 
 [start]
-cmd = "cd backend && uvicorn backend.main:app --host 0.0.0.0 --port $PORT"
+cmd = "/app/.venv/bin/uvicorn backend.main:app --host 0.0.0.0 --port $PORT"
