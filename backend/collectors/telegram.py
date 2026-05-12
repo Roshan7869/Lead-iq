@@ -12,10 +12,9 @@ import asyncio
 import hashlib
 import logging
 import re
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from typing import Any
 
-import httpx
 
 from backend.collectors.base import BaseCollector, RawPost
 from backend.shared.config import settings
@@ -156,8 +155,7 @@ class TelegramCollector(BaseCollector):
         try:
             from telethon import TelegramClient
             from telethon.errors import FloodWaitError
-            from telethon.tl.types import Message
-        except ImportError as exc:
+        except ImportError:
             logger.error("telethon is not installed")
             return []
 

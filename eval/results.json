@@ -194,5 +194,145 @@
     ],
     "email": "contact@mockproducthunt.com",
     "confidence_min": 0.5
+  },
+  "a88ba7ca8fe6": {
+    "company_name": "Mock hacker_news Company",
+    "industry": "Technology",
+    "location": "Remote",
+    "company_size": "11-50",
+    "funding_stage": "seed",
+    "tech_stack": [
+      "Mock",
+      "Tech",
+      "Stack"
+    ],
+    "email": "contact@mockhacker_news.com",
+    "confidence_min": 0.5
+  },
+  "292c05e2f5a8": {
+    "company_name": "Mock hacker_news Company",
+    "industry": "Technology",
+    "location": "Remote",
+    "company_size": "11-50",
+    "funding_stage": "seed",
+    "tech_stack": [
+      "Mock",
+      "Tech",
+      "Stack"
+    ],
+    "email": "contact@mockhacker_news.com",
+    "confidence_min": 0.5
+  },
+  "78b273875a12": {
+    "company_name": "Mock hacker_news Company",
+    "industry": "Technology",
+    "location": "Remote",
+    "company_size": "11-50",
+    "funding_stage": "seed",
+    "tech_stack": [
+      "Mock",
+      "Tech",
+      "Stack"
+    ],
+    "email": "contact@mockhacker_news.com",
+    "confidence_min": 0.5
+  },
+  "e89fa7d70f24": {
+    "company_name": "Mock hacker_news Company",
+    "industry": "Technology",
+    "location": "Remote",
+    "company_size": "11-50",
+    "funding_stage": "seed",
+    "tech_stack": [
+      "Mock",
+      "Tech",
+      "Stack"
+    ],
+    "email": "contact@mockhacker_news.com",
+    "confidence_min": 0.5
+  },
+  "7c23e2f28faa": {
+    "company_name": "Mock hacker_news Company",
+    "industry": "Technology",
+    "location": "Remote",
+    "company_size": "11-50",
+    "funding_stage": "seed",
+    "tech_stack": [
+      "Mock",
+      "Tech",
+      "Stack"
+    ],
+    "email": "contact@mockhacker_news.com",
+    "confidence_min": 0.5
+  },
+  "3826ce204b43": {
+    "company_name": "Mock hacker_news Company",
+    "industry": "Technology",
+    "location": "Remote",
+    "company_size": "11-50",
+    "funding_stage": "seed",
+    "tech_stack": [
+      "Mock",
+      "Tech",
+      "Stack"
+    ],
+    "email": "contact@mockhacker_news.com",
+    "confidence_min": 0.5
+  },
+  "6a9f407bbe06": {
+    "company_name": "Mock hacker_news Company",
+    "industry": "Technology",
+    "location": "Remote",
+    "company_size": "11-50",
+    "funding_stage": "seed",
+    "tech_stack": [
+      "Mock",
+      "Tech",
+      "Stack"
+    ],
+    "email": "contact@mockhacker_news.com",
+    "confidence_min": 0.5
+  },
+  "5c60bcd2c1af": {
+    "company_name": "Mock hacker_news Company",
+    "industry": "Technology",
+    "location": "Remote",
+    "company_size": "11-50",
+    "funding_stage": "seed",
+    "tech_stack": [
+      "Mock",
+      "Tech",
+      "Stack"
+    ],
+    "email": "contact@mockhacker_news.com",
+    "confidence_min": 0.5
+  },
+  "2e4d8932c2a7": {
+    "company_name": "Mock hacker_news Company",
+    "industry": "Technology",
+    "location": "Remote",
+    "company_size": "11-50",
+    "funding_stage": "seed",
+    "tech_stack": [
+      "Mock",
+      "Tech",
+      "Stack"
+    ],
+    "email": "contact@mockhacker_news.com",
+    "confidence_min": 0.5
+  },
+  "19e7b2b8e94d": {
+    "company_name": "Mock hacker_news Company",
+    "industry": "Technology",
+    "location": "Remote",
+    "company_size": "11-50",
+    "funding_stage": "seed",
+    "tech_stack": [
+      "Mock",
+      "Tech",
+      "Stack"
+    ],
+    "email": "contact@mockhacker_news.com",
+    "confidence_min": 0.5
   }
 }

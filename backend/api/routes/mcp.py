@@ -11,15 +11,20 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
+from slowapi.util import get_remote_address
+from slowapi import Limiter
 
 from backend.api.mcp_server import mcp
+
+limiter = Limiter(key_func=get_remote_address)
 
 router = APIRouter(prefix="/api/mcp", tags=["MCP"])
 
 
 @router.get("/tools")
-async def list_mcp_tools() -> dict[str, list[dict[str, Any]]]:
+@limiter.limit("100/minute")
+async def list_mcp_tools(request: Request) -> dict[str, list[dict[str, Any]]]:
     """
     List all MCP tools available via the MCP server.
 

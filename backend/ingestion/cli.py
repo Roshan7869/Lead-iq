@@ -8,9 +8,8 @@ from __future__ import annotations
 import asyncio
 import click
 
-from backend.ingestion.orchestrator import IngestionOrchestrator, run_ingestion
+from backend.ingestion.orchestrator import IngestionOrchestrator
 from backend.ingestion.collectors import get_collectors, get_source_names
-from backend.ingestion.metrics import MetricsLogger
 
 
 @click.group()
@@ -71,7 +70,6 @@ def preview(mode: str) -> None:
 
     Shows the collector configuration without actually running collection.
     """
-    from backend.ingestion.collectors import get_collectors
 
     click.echo(f"Previewing collection for mode: {mode}")
     click.echo("\nCollectors that would be used:")
@@ -107,7 +105,7 @@ def test(source: str) -> None:
                 click.echo(f"  {i+1}. {post.title or post.url}")
     except Exception as exc:
         click.echo(f"Error: {exc}")
-        raise click.Abort()
+        raise click.Abort() from exc
 
 
 if __name__ == "__main__":

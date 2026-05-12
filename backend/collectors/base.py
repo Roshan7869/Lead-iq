@@ -56,6 +56,8 @@ class BaseCollector(ABC):
     """Abstract base for all data collectors."""
 
     source: str  # Must be set by subclass as class attribute
+    enabled: bool = True
+    requires_env: list[str] = []
 
     @abstractmethod
     async def collect(self) -> list[RawPost]:
@@ -63,5 +65,9 @@ class BaseCollector(ABC):
         ...
 
     async def run(self) -> list[RawPost]:
-        """Entry point: collect → deduplicate check is done by pipeline.py."""
+        """Entry point: collect -> deduplicate check is done by pipeline.py."""
         return await self.collect()
+
+    async def healthy(self) -> bool:
+        """Check if collector can run. Override for env-var checks."""
+        return self.enabled

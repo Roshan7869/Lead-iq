@@ -18,7 +18,7 @@ from __future__ import annotations
 import json
 import math
 import structlog
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Any
 
 import redis.asyncio as aioredis

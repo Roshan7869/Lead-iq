@@ -4,7 +4,7 @@ bot/formatter.py — Convert lead records to Telegram-safe HTML messages.
 from __future__ import annotations
 
 from html import escape
-from typing import Sequence
+from collections.abc import Sequence
 
 
 def format_lead_message(lead) -> str:

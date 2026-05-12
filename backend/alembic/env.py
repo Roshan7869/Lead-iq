@@ -10,17 +10,18 @@ from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-# Add the backend directory to the path for imports
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Add the project root to the path for imports (backend/ is under it)
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from backend.shared.db import Base
-from backend.shared.models import Post, Lead, Feedback, QuotaUsage, UserProfile  # noqa: F401
+from backend.shared.config import settings
+from backend.shared.models import Post, Lead, Feedback, QuotaUsage, UserProfile, CompanyContext, GovScheme, FundingEvent, JobSignal  # noqa: F401
 
 config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-database_url = os.getenv("DATABASE_URL")
+database_url = settings.DATABASE_URL or os.getenv("DATABASE_URL")
 if database_url:
     config.set_main_option("sqlalchemy.url", database_url)
 

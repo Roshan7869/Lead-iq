@@ -7,7 +7,7 @@ Provides:
   - verify_credentials — constant-time credential comparison (no timing attacks)
 
 Credentials are configured via env vars ADMIN_USERNAME / ADMIN_PASSWORD.
-For multi-user setups, extend verify_credentials to query a users table.
+Token blocklist is Redis-backed for multi-instance deployments.
 """
 from __future__ import annotations
 
@@ -18,26 +18,55 @@ from jose import JWTError, jwt
 
 from backend.shared.config import settings
 
-# ── Token Blocklist (in-memory; use Redis for multi-instance) ─────────────────
-# Tokens added here are revoked immediately. In production, back this with Redis
-# or a shared store so all instances respect revocations.
-_token_blocklist: set[str] = set()
-_BLOCKLIST_MAX_SIZE = 10_000  # safety cap to prevent unbounded growth
+# ── Token Blocklist (Redis-backed for multi-instance) ────────────────────────
+# Single instance fallback: use in-memory set if Redis is unavailable.
+_token_blocklist_inmem: set[str] = set()
+_BLOCKLIST_MAX_SIZE = 10_000
+_BLOCKLIST_KEY = "leadiq:blocklist"
+
+
+def _get_redis():
+    try:
+        import redis.asyncio as aioredis
+        return aioredis.from_url(settings.REDIS_URL, encoding="utf-8", decode_responses=True)
+    except Exception:
+        return None
+
+
+def _redis_blocklist_add(token: str) -> None:
+    r = _get_redis()
+    if r:
+        r.sadd(_BLOCKLIST_KEY, token)
+        r.expire(_BLOCKLIST_KEY, 86400)
+
+
+def _redis_blocklist_check(token: str) -> bool | None:
+    r = _get_redis()
+    if r:
+        return r.sismember(_BLOCKLIST_KEY, token)
+    return None
+
+
+def _prune_inmem_blocklist() -> None:
+    if len(_token_blocklist_inmem) > _BLOCKLIST_MAX_SIZE:
+        half = sorted(_token_blocklist_inmem)[:_BLOCKLIST_MAX_SIZE // 2]
+        _token_blocklist_inmem.difference_update(half)
 
 
 def revoke_token(token: str) -> None:
     """Add a token to the revocation list. Call on logout."""
     if not token:
         return
-    _token_blocklist.add(token)
-    # crude TTL: if list grows too large, drop oldest half (by arbitrary order)
-    if len(_token_blocklist) > _BLOCKLIST_MAX_SIZE:
-        half = sorted(_token_blocklist)[:_BLOCKLIST_MAX_SIZE // 2]
-        _token_blocklist.difference_update(half)
+    _redis_blocklist_add(token)
+    _token_blocklist_inmem.add(token)
+    _prune_inmem_blocklist()
 
 
 def is_token_revoked(token: str) -> bool:
-    return token in _token_blocklist
+    redis_result = _redis_blocklist_check(token)
+    if redis_result is not None:
+        return redis_result
+    return token in _token_blocklist_inmem
 
 
 # ── Token creation ────────────────────────────────────────────────────────────

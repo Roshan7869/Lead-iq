@@ -12,7 +12,6 @@ import logging
 
 from fastapi import APIRouter, HTTPException, Query
 from fastapi.security import HTTPBearer
-from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
 from backend.api.deps import CurrentUser
@@ -94,12 +93,12 @@ async def update_lead(
             if lead is None:
                 raise HTTPException(status_code=404, detail="Lead not found")
             return LeadUpdateResponse(lead=LeadOut.model_validate(lead))
-    except SQLAlchemyError:
-        raise HTTPException(status_code=503, detail="Database unavailable")
+    except SQLAlchemyError as exc:
+        raise HTTPException(status_code=503, detail="Database unavailable") from exc
     except HTTPException:
         raise
-    except Exception:
-        raise HTTPException(status_code=500, detail="Internal server error")
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail="Internal server error") from exc
     finally:
         if session:
             await session.close()

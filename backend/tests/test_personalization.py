@@ -5,10 +5,8 @@ query generation, and composite score computation.
 """
 from __future__ import annotations
 
-import math
 from datetime import UTC, datetime, timedelta
 
-import pytest
 
 from backend.services.personalization import (
     QueryGenerator,

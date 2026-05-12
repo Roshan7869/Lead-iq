@@ -1,0 +1,681 @@
+{
+  "q1_llm_gemini_extract_confidence_nodes": [
+    {
+      "kind": "Function",
+      "name": "_calculate_confidence",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/collectors/telegram.py::TelegramCollector._calculate_confidence",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/collectors/telegram.py",
+      "signature": "def _calculate_confidence((\n        self, signals: dict[str, Any], source_trust: float\n    )) -> float",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "_extract_title",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/collectors/telegram.py::TelegramCollector._extract_title",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/collectors/telegram.py",
+      "signature": "def _extract_title((self, body: str, signals: dict[str, Any])) -> str",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "extract_signals",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/collectors/telegram.py::extract_signals",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/collectors/telegram.py",
+      "signature": "def extract_signals((text: str)) -> dict[str, Any]",
+      "is_test": 0
+    },
+    {
+      "kind": "File",
+      "name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/SOURCE_PROMPTS.py",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/SOURCE_PROMPTS.py",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/SOURCE_PROMPTS.py",
+      "signature": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/SOURCE_PROMPTS.py",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "get_generic_prompt",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/SOURCE_PROMPTS.py::get_generic_prompt",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/SOURCE_PROMPTS.py",
+      "signature": "def get_generic_prompt(()) -> str",
+      "is_test": 0
+    },
+    {
+      "kind": "File",
+      "name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/__init__.py",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/__init__.py",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/__init__.py",
+      "signature": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/__init__.py",
+      "is_test": 0
+    },
+    {
+      "kind": "Class",
+      "name": "CircuitState",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/circuit_breaker.py::CircuitState",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/circuit_breaker.py",
+      "signature": "class CircuitState",
+      "is_test": 0
+    },
+    {
+      "kind": "File",
+      "name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/circuit_breaker.py",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/circuit_breaker.py",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/circuit_breaker.py",
+      "signature": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/circuit_breaker.py",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "get_state",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/circuit_breaker.py::get_state",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/circuit_breaker.py",
+      "signature": "def get_state((name: str = \"gemini\")) -> CircuitState",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "record_failure",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/circuit_breaker.py::record_failure",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/circuit_breaker.py",
+      "signature": "def record_failure((name: str = \"gemini\", threshold: int = 5, recovery_timeout: int = 60))",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "record_success",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/circuit_breaker.py::record_success",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/circuit_breaker.py",
+      "signature": "def record_success((name: str = \"gemini\"))",
+      "is_test": 0
+    },
+    {
+      "kind": "File",
+      "name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/cost_guard.py",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/cost_guard.py",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/cost_guard.py",
+      "signature": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/cost_guard.py",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "check_budget",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/cost_guard.py::check_budget",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/cost_guard.py",
+      "signature": "def check_budget((tokens_requested: int)) -> bool",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "get_budget_status",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/cost_guard.py::get_budget_status",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/cost_guard.py",
+      "signature": "def get_budget_status(()) -> dict",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "get_redis",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/cost_guard.py::get_redis",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/cost_guard.py",
+      "signature": "def get_redis(()) -> aioredis.Redis",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "reset_budget",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/cost_guard.py::reset_budget",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/cost_guard.py",
+      "signature": "def reset_budget(()) -> None",
+      "is_test": 0
+    },
+    {
+      "kind": "File",
+      "name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "signature": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "compute_confidence",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py::compute_confidence",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "signature": "def compute_confidence((lead: dict[str, Any], source: str)) -> float",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "extract_from_image",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py::extract_from_image",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "signature": "def extract_from_image((\n    image_bytes: bytes,\n    instruction: str,\n    mime_type: str = \"image/png\",\n)) -> dict[str, Any]",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "extract_lead",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py::extract_lead",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "signature": "def extract_lead((\n    markdown_content: str,\n    source: str,\n    url: str,\n)) -> dict[str, Any]",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "get_embedding",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py::get_embedding",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "signature": "def get_embedding((text: str)) -> list[float] | None",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "parse_natural_language_icp",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py::parse_natural_language_icp",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "signature": "def parse_natural_language_icp((description: str)) -> dict[str, Any]",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "regex_fallback_extract",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py::regex_fallback_extract",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "signature": "def regex_fallback_extract((\n    markdown_content: str,\n    source: str,\n    url: str,\n)) -> dict[str, Any]",
+      "is_test": 0
+    },
+    {
+      "kind": "File",
+      "name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/services/confidence.py",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/services/confidence.py",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/services/confidence.py",
+      "signature": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/services/confidence.py",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "compute_confidence",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/services/confidence.py::compute_confidence",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/services/confidence.py",
+      "signature": "def compute_confidence((lead: dict[str, Any], source: str)) -> float",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "compute_field_score",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/services/confidence.py::compute_field_score",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/services/confidence.py",
+      "signature": "def compute_field_score((lead: dict[str, Any])) -> float",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "explain_confidence",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/services/confidence.py::explain_confidence",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/services/confidence.py",
+      "signature": "def explain_confidence((lead: dict[str, Any], source: str)) -> dict[str, Any]",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "get_source_trust",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/services/confidence.py::get_source_trust",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/services/confidence.py",
+      "signature": "def get_source_trust((source: str)) -> float",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "enrich_with_gemini",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/services/waterfall_enrichment.py::enrich_with_gemini",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/services/waterfall_enrichment.py",
+      "signature": "def enrich_with_gemini((\n    content: str,\n    source: str,\n    url: str,\n)) -> dict[str, Any] | None",
+      "is_test": 0
+    },
+    {
+      "kind": "Class",
+      "name": "GeminiAnalyzer",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/workers/analyzer.py::GeminiAnalyzer",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/workers/analyzer.py",
+      "signature": "class GeminiAnalyzer",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "__init__",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/workers/analyzer.py::GeminiAnalyzer.__init__",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/workers/analyzer.py",
+      "signature": "def __init__((self)) -> None",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "_classify",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/workers/analyzer.py::GeminiAnalyzer._classify",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/workers/analyzer.py",
+      "signature": "def _classify((self, text: str, source: str, mode: str = \"b2b_sales\")) -> AnalysisResult",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "_enrich",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/workers/analyzer.py::GeminiAnalyzer._enrich",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/workers/analyzer.py",
+      "signature": "def _enrich((self, result: AnalysisResult, text: str, source: str, author: str, mode: str = \"b2b_sales\")) -> None",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "_heuristic_classify",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/workers/analyzer.py::GeminiAnalyzer._heuristic_classify",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/workers/analyzer.py",
+      "signature": "def _heuristic_classify((self, text: str, mode: str = \"b2b_sales\")) -> AnalysisResult",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "_init_model",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/workers/analyzer.py::GeminiAnalyzer._init_model",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/workers/analyzer.py",
+      "signature": "def _init_model((self)) -> None",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "analyze",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/workers/analyzer.py::GeminiAnalyzer.analyze",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/workers/analyzer.py",
+      "signature": "def analyze((self, text: str, source: str = \"\", author: str = \"\", mode: str = \"b2b_sales\")) -> AnalysisResult",
+      "is_test": 0
+    },
+    {
+      "kind": "Class",
+      "name": "GeminiRateLimiter",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/workers/rate_limiter.py::GeminiRateLimiter",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/workers/rate_limiter.py",
+      "signature": "class GeminiRateLimiter",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "__init__",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/workers/rate_limiter.py::GeminiRateLimiter.__init__",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/workers/rate_limiter.py",
+      "signature": "def __init__((self, client: aioredis.Redis)) -> None",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "_rpd_key",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/workers/rate_limiter.py::GeminiRateLimiter._rpd_key",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/workers/rate_limiter.py",
+      "signature": "def _rpd_key((self, model: str)) -> str",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "_rpm_key",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/workers/rate_limiter.py::GeminiRateLimiter._rpm_key",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/workers/rate_limiter.py",
+      "signature": "def _rpm_key((self, model: str)) -> str",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "acquire",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/workers/rate_limiter.py::GeminiRateLimiter.acquire",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/workers/rate_limiter.py",
+      "signature": "def acquire((\r\n        self, model: str, tokens_estimate: int = 500, max_wait_seconds: float = 30.0\r\n    )) -> AsyncGenerator[None, None]",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "check_and_increment",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/workers/rate_limiter.py::GeminiRateLimiter.check_and_increment",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/workers/rate_limiter.py",
+      "signature": "def check_and_increment((self, model: str)) -> bool",
+      "is_test": 0
+    },
+    {
+      "kind": "Function",
+      "name": "extract_lead_from_url",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/eval/run_eval.py::extract_lead_from_url",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/eval/run_eval.py",
+      "signature": "def extract_lead_from_url((\n    source: str, url: str, client: httpx.AsyncClient\n)) -> dict[str, Any]",
+      "is_test": 0
+    },
+    {
+      "kind": "Test",
+      "name": "test_gemini_calls_guarded_by_cost_check",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/tests/architecture/test_fitness_functions.py::test_gemini_calls_guarded_by_cost_check",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/tests/architecture/test_fitness_functions.py",
+      "signature": "def test_gemini_calls_guarded_by_cost_check(())",
+      "is_test": 1
+    }
+  ],
+  "q2_callers_of_gemini_service": [
+    {
+      "kind": "CALLS",
+      "source_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py::extract_lead",
+      "target_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py::regex_fallback_extract",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py"
+    },
+    {
+      "kind": "CALLS",
+      "source_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py::extract_lead",
+      "target_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py::compute_confidence",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py"
+    },
+    {
+      "kind": "CALLS",
+      "source_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/services/icp_service.py::parse_icp",
+      "target_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py::parse_natural_language_icp",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/services/icp_service.py"
+    },
+    {
+      "kind": "CALLS",
+      "source_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/services/waterfall_enrichment.py::enrich_with_gemini",
+      "target_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py::extract_lead",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/services/waterfall_enrichment.py"
+    },
+    {
+      "kind": "CALLS",
+      "source_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/workers/tracxn-actor/main.py::scrape_tracxn",
+      "target_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py::extract_lead",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/workers/tracxn-actor/main.py"
+    }
+  ],
+  "q3_imports_of_gemini_service": [
+    {
+      "kind": "IMPORTS_FROM",
+      "source_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "target_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/SOURCE_PROMPTS.py",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py"
+    },
+    {
+      "kind": "IMPORTS_FROM",
+      "source_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "target_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/cost_guard.py",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py"
+    },
+    {
+      "kind": "IMPORTS_FROM",
+      "source_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "target_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/shared/config.py",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py"
+    },
+    {
+      "kind": "IMPORTS_FROM",
+      "source_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "target_qualified": "backend.llm.confidence",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py"
+    },
+    {
+      "kind": "IMPORTS_FROM",
+      "source_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "target_qualified": "json",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py"
+    },
+    {
+      "kind": "IMPORTS_FROM",
+      "source_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "target_qualified": "re",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py"
+    },
+    {
+      "kind": "IMPORTS_FROM",
+      "source_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "target_qualified": "structlog",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py"
+    },
+    {
+      "kind": "IMPORTS_FROM",
+      "source_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "target_qualified": "typing",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py"
+    },
+    {
+      "kind": "IMPORTS_FROM",
+      "source_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "target_qualified": "vertexai.generative_models",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py"
+    },
+    {
+      "kind": "IMPORTS_FROM",
+      "source_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "target_qualified": "vertexai.language_models",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py"
+    }
+  ],
+  "q4_llm_test_files": [
+    {
+      "kind": "Test",
+      "name": "test_gemini_calls_guarded_by_cost_check",
+      "qualified_name": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/tests/architecture/test_fitness_functions.py::test_gemini_calls_guarded_by_cost_check",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/tests/architecture/test_fitness_functions.py",
+      "signature": "def test_gemini_calls_guarded_by_cost_check(())"
+    }
+  ],
+  "q5_blast_radius_gemini_service": [
+    {
+      "kind": "CALLS",
+      "source_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py::extract_lead",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "target_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py::compute_confidence"
+    },
+    {
+      "kind": "CALLS",
+      "source_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py::extract_lead",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "target_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py::regex_fallback_extract"
+    },
+    {
+      "kind": "CALLS",
+      "source_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/services/icp_service.py::parse_icp",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/services/icp_service.py",
+      "target_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py::parse_natural_language_icp"
+    },
+    {
+      "kind": "CALLS",
+      "source_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/services/waterfall_enrichment.py::enrich_with_gemini",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/services/waterfall_enrichment.py",
+      "target_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py::extract_lead"
+    },
+    {
+      "kind": "CALLS",
+      "source_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/workers/tracxn-actor/main.py::scrape_tracxn",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/workers/tracxn-actor/main.py",
+      "target_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py::extract_lead"
+    },
+    {
+      "kind": "CONTAINS",
+      "source_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "target_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py::compute_confidence"
+    },
+    {
+      "kind": "CONTAINS",
+      "source_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "target_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py::extract_from_image"
+    },
+    {
+      "kind": "CONTAINS",
+      "source_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "target_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py::extract_lead"
+    },
+    {
+      "kind": "CONTAINS",
+      "source_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "target_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py::get_embedding"
+    },
+    {
+      "kind": "CONTAINS",
+      "source_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "target_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py::parse_natural_language_icp"
+    },
+    {
+      "kind": "CONTAINS",
+      "source_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "target_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py::regex_fallback_extract"
+    },
+    {
+      "kind": "IMPORTS_FROM",
+      "source_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/services/icp_service.py",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/services/icp_service.py",
+      "target_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py"
+    },
+    {
+      "kind": "IMPORTS_FROM",
+      "source_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/services/waterfall_enrichment.py",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/services/waterfall_enrichment.py",
+      "target_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py"
+    },
+    {
+      "kind": "IMPORTS_FROM",
+      "source_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/workers/dpiit-actor/main.py",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/workers/dpiit-actor/main.py",
+      "target_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py"
+    },
+    {
+      "kind": "IMPORTS_FROM",
+      "source_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/workers/mca21-actor/main.py",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/workers/mca21-actor/main.py",
+      "target_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py"
+    },
+    {
+      "kind": "IMPORTS_FROM",
+      "source_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/workers/tracxn-actor/main.py",
+      "file_path": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/workers/tracxn-actor/main.py",
+      "target_qualified": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py"
+    }
+  ],
+  "q6_collector_to_llm": [
+    {
+      "start_file": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/collectors/telegram.py",
+      "cur": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/collectors/telegram.py::extract_signals",
+      "d": 0
+    },
+    {
+      "start_file": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/collectors/telegram.py",
+      "cur": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/collectors/telegram.py::TelegramCollector._extract_title",
+      "d": 0
+    },
+    {
+      "start_file": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/collectors/telegram.py",
+      "cur": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/collectors/telegram.py::extract_signals",
+      "d": 1
+    },
+    {
+      "start_file": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/collectors/telegram.py",
+      "cur": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/collectors/telegram.py::TelegramCollector._extract_title",
+      "d": 1
+    },
+    {
+      "start_file": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/collectors/telegram.py",
+      "cur": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/collectors/telegram.py::TelegramCollector._extract_title",
+      "d": 2
+    },
+    {
+      "start_file": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/collectors/telegram.py",
+      "cur": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/collectors/telegram.py::extract_signals",
+      "d": 2
+    },
+    {
+      "start_file": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/ingestion/collectors.py",
+      "cur": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/collectors/telegram.py::extract_signals",
+      "d": 2
+    },
+    {
+      "start_file": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/collectors/telegram.py",
+      "cur": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/collectors/telegram.py::extract_signals",
+      "d": 3
+    },
+    {
+      "start_file": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/collectors/telegram.py",
+      "cur": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/collectors/telegram.py::TelegramCollector._extract_title",
+      "d": 3
+    },
+    {
+      "start_file": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/ingestion/collectors.py",
+      "cur": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/collectors/telegram.py::TelegramCollector._extract_title",
+      "d": 3
+    },
+    {
+      "start_file": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/collectors/telegram.py",
+      "cur": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/collectors/telegram.py::extract_signals",
+      "d": 4
+    },
+    {
+      "start_file": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/collectors/telegram.py",
+      "cur": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/collectors/telegram.py::TelegramCollector._extract_title",
+      "d": 4
+    },
+    {
+      "start_file": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/ingestion/collectors.py",
+      "cur": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/collectors/telegram.py::extract_signals",
+      "d": 4
+    },
+    {
+      "start_file": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/ingestion/collectors.py",
+      "cur": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/collectors/telegram.py::TelegramCollector._extract_title",
+      "d": 4
+    },
+    {
+      "start_file": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/ingestion/collectors.py",
+      "cur": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/collectors/telegram.py::extract_signals",
+      "d": 5
+    },
+    {
+      "start_file": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/ingestion/collectors.py",
+      "cur": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/collectors/telegram.py::TelegramCollector._extract_title",
+      "d": 5
+    }
+  ],
+  "q6_llm_to_model": [
+    {
+      "start_file": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "cur": "vertexai.generative_models",
+      "d": 1
+    },
+    {
+      "start_file": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "cur": "vertexai.language_models",
+      "d": 1
+    },
+    {
+      "start_file": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "cur": "GenerativeModel",
+      "d": 1
+    },
+    {
+      "start_file": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "cur": "GenerativeModel",
+      "d": 2
+    },
+    {
+      "start_file": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/cost_guard.py",
+      "cur": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/shared/config.py::Settings.model_dump",
+      "d": 3
+    },
+    {
+      "start_file": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "cur": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/shared/config.py::Settings.model_dump",
+      "d": 3
+    },
+    {
+      "start_file": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/__init__.py",
+      "cur": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/shared/config.py::Settings.model_dump",
+      "d": 4
+    },
+    {
+      "start_file": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/llm/gemini_service.py",
+      "cur": "/mnt/c/Users/USER/Downloads/b_a6LznsoAKUT-1774336963705/backend/shared/config.py::Settings.model_dump",
+      "d": 4
+    }
+  ]
+}

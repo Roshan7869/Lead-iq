@@ -5,7 +5,6 @@ Tests DLQWorker.capture(), process_retries(), mark_resolved(), and get_stats().
 """
 from __future__ import annotations
 
-import asyncio
 import json
 from datetime import datetime, timedelta
 from typing import Any
@@ -188,7 +187,11 @@ async def test_mark_resolved(dlq_worker: DLQWorker):
 @pytest.mark.asyncio
 async def test_get_stats_returns_all_stages(dlq_worker: DLQWorker):
     """Test get_stats() returns counts for all stages."""
-    # Mock stage count query
+    # Build a list of mock results for each sequential db.execute() call
+    # 1. total count, 2. stage counts, 3. oldest failure, 4. task counts
+    total_result = MagicMock()
+    total_result.scalar_one.return_value = 20
+
     stage_result = MagicMock()
     stage_result.all.return_value = [
         (LeadDLQStage.new, 5),
@@ -196,25 +199,22 @@ async def test_get_stats_returns_all_stages(dlq_worker: DLQWorker):
         (LeadDLQStage.failed_permanent, 3),
         (LeadDLQStage.resolved, 10),
     ]
-    dlq_worker.db.execute = AsyncMock(return_value=stage_result)
 
-    # Mock total count
-    total_result = MagicMock()
-    total_result.scalar_one.return_value = 20
-    dlq_worker.db.execute = AsyncMock(return_value=total_result)
-
-    # Mock oldest failure
     oldest_result = MagicMock()
-    oldest_result.scalar_one.return_value = datetime.utcnow() - timedelta(hours=1)
-    dlq_worker.db.execute = AsyncMock(return_value=oldest_result)
+    oldest_result.scalar_one_or_none.return_value = datetime.utcnow() - timedelta(hours=1)
 
-    # Mock task counts
     task_result = MagicMock()
     task_result.all.return_value = [
         ("pipeline.dedup_lead", 15),
         ("pipeline.collect_and_publish", 5),
     ]
-    dlq_worker.db.execute = AsyncMock(return_value=task_result)
+
+    failed_result = MagicMock()
+    failed_result.scalar_one.return_value = 3
+
+    dlq_worker.db.execute = AsyncMock(side_effect=[
+        total_result, stage_result, oldest_result, task_result, failed_result,
+    ])
 
     stats = await dlq_worker.get_stats()
 

@@ -10,15 +10,10 @@ Target: 28/32 (87%) to unlock Day 2 tasks.
 """
 from __future__ import annotations
 
-import ast
-import importlib
-import inspect
-import os
 import re
 import sys
 from pathlib import Path
 from dataclasses import dataclass, field
-from typing import Any
 
 # ── ANSI colours ──────────────────────────────────────────────────────────────
 GREEN  = "\033[92m"

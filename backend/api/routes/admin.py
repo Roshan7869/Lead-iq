@@ -39,7 +39,6 @@ from backend.shared.repository import FeedbackRepo, LeadRepo, QuotaRepo, Profile
 from backend.shared.config import settings
 from backend.shared.stream import redis_stream
 
-from backend.llm.circuit_breaker import get_state
 
 logger = structlog.get_logger(__name__)
 
@@ -302,8 +301,8 @@ async def retry_dlq_record(
         task_name = "pipeline.dedup_lead"  # Default - improve task name extraction
         task_args = original_data.get("args", [])
         task_kwargs = original_data.get("kwargs", {})
-    except Exception:
-        raise HTTPException(status_code=400, detail="Invalid original data")
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail="Invalid original data") from exc
 
     # Get task router entry
     task_func = TASK_ROUTER.get(task_name)
@@ -330,7 +329,7 @@ async def retry_dlq_record(
     except Exception as exc:
         logger = structlog.get_logger()
         logger.error("dlq_retry_failed", dlq_id=dlq_id, error=str(exc))
-        raise HTTPException(status_code=500, detail=f"Failed to requeue: {str(exc)}")
+        raise HTTPException(status_code=500, detail=f"Failed to requeue: {str(exc)}") from exc
 
 
 @router.post("/dlq/{dlq_id}/resolve", response_model=DLQResolveResponse)
@@ -401,4 +400,151 @@ async def get_dlq_stats(
             oldest_failure=stats["oldest_failure"],
         )
     )
+
+
+# ── Budget Status (Day 10: Cost Stable) ──────────────────────────────────────
+
+
+@router.get("/budget-status")
+async def budget_status(_user: CurrentUser):
+    """Returns current Gemini token budget status (daily + hourly + queue)."""
+    from backend.llm.cost_guard import get_budget_status
+    return await get_budget_status()
+
+
+# ── Source Quality Metrics (Day 11: Source Audit) ─────────────────────────────
+
+
+@router.get("/source-metrics")
+async def source_metrics(days: int = 7, _user: CurrentUser = None):
+    """Per-source qualification rates over N days."""
+    from backend.workers.source_metrics import get_all_source_metrics
+    return {"metrics": await get_all_source_metrics(days=days), "window_days": days}
+
+
+@router.post("/source-audit")
+async def trigger_source_audit(days: int = 7, _user: CurrentUser = None):
+    """Run full source audit and save to source_audit.json."""
+    from backend.workers.source_metrics import run_source_audit
+    return await run_source_audit(days=days)
+
+
+# ── Daily Metrics (Day 13: Celery Beat) ────────────────────────────────────
+
+
+@router.get("/daily-metrics")
+async def get_daily_metrics(days: int = 7, _user: CurrentUser = None):
+    """Returns daily metrics for the past N days."""
+    import json
+    from backend.shared.stream import redis_stream
+    from datetime import date, timedelta
+
+    r = redis_stream._r
+    if not r:
+        return {"error": "Redis not connected"}
+
+    today = date.today()
+    metrics_list = []
+    for i in range(days):
+        day = today - timedelta(days=i)
+        key = f"daily_metrics:{day.isoformat()}"
+        data = await r.hgetall(key)
+        if data:
+            parsed = {}
+            for k, v in data.items():
+                try:
+                    parsed[k] = json.loads(v)
+                except (json.JSONDecodeError, TypeError):
+                    parsed[k] = v
+            metrics_list.append(parsed)
+
+    return {"metrics": metrics_list, "days": days}
+
+
+# ── TOS Compliance (Day 12: Legal Clean) ──────────────────────────────────────
+
+
+@router.get("/compliance")
+async def get_compliance(_user: CurrentUser = None):
+    """Full compliance posture for all sources."""
+    from backend.compliance.tos_registry import get_compliance_summary
+    return get_compliance_summary()
+
+
+@router.get("/compliance/{source}")
+async def get_source_compliance(source: str, _user: CurrentUser = None):
+    """Compliance posture for a single source."""
+    from backend.compliance.tos_registry import check_source_compliance
+    result = check_source_compliance(source)
+    if result["status"] == "blocked" and result.get("reason"):
+        return result
+    return result
+
+
+# ── Prompt Versioning (Day 18) ───────────────────────────────────────────────
+
+
+@router.get("/prompt-versions")
+async def get_prompt_versions(_user: CurrentUser = None):
+    """Current prompt versions for all sources."""
+    from backend.llm.prompt_versioning import PROMPT_VERSIONS, PROMPT_CHANGELOG
+    return {
+        "versions": PROMPT_VERSIONS,
+        "changelogs": {
+            src: log[-5:] for src, log in PROMPT_CHANGELOG.items()
+        },
+    }
+
+
+@router.get("/prompt-versions/{source}")
+async def get_source_prompt_version(source: str, _user: CurrentUser = None):
+    """Prompt version and changelog for a single source."""
+    from backend.llm.prompt_versioning import get_prompt_version, get_changelog
+    return {
+        "source": source,
+        "version": get_prompt_version(source),
+        "changelog": get_changelog(source),
+    }
+
+
+@router.post("/prompt-versions/{source}/bump")
+async def bump_prompt_version(source: str, _user: CurrentUser = None):
+    """Bump prompt version for a source (admin only)."""
+    from backend.llm.prompt_versioning import bump_prompt_version
+    new_ver = bump_prompt_version(source, "Manual bump via admin API")
+    return {"source": source, "new_version": new_ver}
+
+
+@router.post("/ab-experiments")
+async def create_ab_experiment(
+    name: str = "",
+    variants: str = "",
+    _user: CurrentUser = None,
+):
+    """Start an A/B experiment for prompt variants (comma-separated)."""
+    from backend.llm.prompt_versioning import start_experiment
+
+    if not name:
+        from datetime import datetime
+        name = f"experiment_{datetime.now().strftime('%Y%m%d_%H%M')}"
+
+    variant_list = [v.strip() for v in variants.split(",") if v.strip()]
+    if len(variant_list) < 2:
+        return {"error": "Need at least 2 variants (comma-separated)"}
+
+    return await start_experiment(name, variant_list)
+
+
+@router.get("/ab-experiments/{experiment_id}")
+async def get_ab_experiment(experiment_id: str, _user: CurrentUser = None):
+    """Get A/B experiment results."""
+    from backend.llm.prompt_versioning import get_ab_results
+    return await get_ab_results(experiment_id)
+
+
+@router.post("/ab-experiments/{experiment_id}/stop")
+async def stop_ab_experiment(experiment_id: str, _user: CurrentUser = None):
+    """Stop a running A/B experiment."""
+    from backend.llm.prompt_versioning import stop_experiment
+    return await stop_experiment(experiment_id)
 

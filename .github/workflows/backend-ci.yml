@@ -1,0 +1,88 @@
+name: Backend CI + Deploy
+
+on:
+  push:
+    branches: [main, develop]
+    paths: ["backend/**"]
+  pull_request:
+    branches: [main, develop]
+    paths: ["backend/**"]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Ruff lint
+        run: |
+          cd backend
+          uv run ruff check .
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Mypy
+        run: |
+          cd backend
+          uv run mypy . --ignore-missing-imports
+
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: leadiq_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Run tests
+        env:
+          DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/leadiq_test
+          REDIS_URL: redis://localhost:6379/0
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          RUN_INTEGRATION_TESTS: '1'
+        run: |
+          cd backend
+          uv run pytest tests/ -v --cov --cov-report=xml
+          uv run pytest tests/services/ -v --cov --cov-report=xml --cov-append
+
+  deploy:
+    needs: [lint, typecheck, test]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to Railway
+        run: |
+          echo "Railway deploy trigger (PROD)"
+          # Railway webhook or CLI deploy would go here

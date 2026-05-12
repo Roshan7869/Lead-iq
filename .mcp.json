@@ -1,9 +1,16 @@
 {
   "mcpServers": {
     "code-review-graph": {
-      "command": "code-review-graph",
+      "command": "/home/roshan/nexus/venv/bin/code-review-graph",
       "args": [
         "serve"
+      ],
+      "type": "stdio"
+    },
+    "nexus": {
+      "command": "/home/roshan/nexus/venv/bin/python3",
+      "args": [
+        "/home/roshan/nexus/server/nexus-mcp-enhanced.py"
       ],
       "type": "stdio"
     }

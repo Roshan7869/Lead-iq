@@ -10,15 +10,16 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
+from enum import StrEnum
 from typing import Any
 
-from sqlalchemy import Column, DateTime, Enum, Integer, String, Text
+from sqlalchemy import Column, DateTime, Integer, String, Text
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 
 from backend.shared.db import Base
 
 
-class LeadDLQStage(str):
+class LeadDLQStage(StrEnum):
     """DLQ queue stages."""
     new = "new"
     retrying = "retrying"

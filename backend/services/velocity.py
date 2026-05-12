@@ -19,7 +19,6 @@ Usage:
 from __future__ import annotations
 
 import time
-from typing import Optional
 
 import redis.asyncio as aioredis
 
@@ -35,7 +34,7 @@ class VelocityTracker:
 
     def __init__(self, redis_url: str = "") -> None:
         self._url: str = redis_url or settings.REDIS_URL
-        self._client: Optional[aioredis.Redis] = None
+        self._client: aioredis.Redis | None = None
 
     # ── Lifecycle ──────────────────────────────────────────────────────────────
 
@@ -112,7 +111,7 @@ class VelocityTracker:
             counts = await pipe.execute()
             return {
                 name: int(count)
-                for name, count in zip(company_names, counts)
+                for name, count in zip(company_names, counts, strict=True)
                 if isinstance(count, int)
             }
         except Exception:

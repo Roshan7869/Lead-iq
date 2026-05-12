@@ -1,0 +1,56 @@
+# render.yaml - Render Blueprint for LeadIQ v3 (Free Tier)
+# Deploy: ray.io/link or `render blueprint apply render.yaml`
+
+services:
+  # ── MCP Server (REST API) ────────────────────────────────
+  - name: leadiq-mcp
+    env: python
+    region: oregon
+    plan: free
+    runtime: pip
+    buildCommand: ./render_build.sh
+    startCommand: python3 -m uvicorn backend.mcp_server:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: GITHUB_TOKEN
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+
+  # ── TUI Dashboard (background worker) ────────────────────
+  - name: leadiq-collector
+    env: python
+    region: oregon
+    plan: free
+    runtime: pip
+    buildCommand: ./render_build.sh
+    startCommand: python3 scripts/run_world_class_pipeline.py
+    schedule: cron(* * * * *)
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: GITHUB_TOKEN
+        sync: false
+
+  # ── Redis Cache (optional, for lead deduplication) ───────
+  - name: leadiq-redis
+    plan: free
+    region: oregon
+    image: redis:7-alpine
+
+  # ── Neo4j Graph DB (optional, for relationship intelligence) ──
+  # NOTE: Neo4j Free Tier has 1GB memory limit — good for dev
+  # For prod, use Neo4j Aura (free tier: 1 node, 200k nodes)
+  - name: leadiq-neo4j
+    plan: free
+    region: oregon
+    image: neo4j:5
+    envVars:
+      - key: NEO4J_AUTH
+        value: neo4j/password
+      - key: NEO4J_dbms_memory_heap_initial__size
+        value: 256M
+      - key: NEO4J_dbms_memory_heap_max__size
+        value: 512M

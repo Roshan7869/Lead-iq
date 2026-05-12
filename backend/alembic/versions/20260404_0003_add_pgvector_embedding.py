@@ -21,22 +21,18 @@ def upgrade() -> None:
     # Create pgvector extension
     op.execute("CREATE EXTENSION IF NOT EXISTS vector")
 
-    # Add embedding column to leads table
+    # Add embedding column to leads table (pgvector type)
+    from pgvector.sqlalchemy import Vector
     op.add_column(
         "leads",
-        sa.Column("embedding", sa.ARRAY(sa.Float), nullable=True),
+        sa.Column("embedding", Vector(768), nullable=True),
     )
 
-    # Add indexes for the embedding column
-    op.create_index(
-        "ix_leads_embedding",
-        "leads",
-        ["embedding"],
-        postgresql_using="ivfflat",
-        postgresql_opclass_map={"embedding": "vector_cosine_ops"},
-    )
+    # Add indexes for the embedding column (raw SQL for pgvector dialect support)
+    op.execute("CREATE INDEX IF NOT EXISTS ix_leads_embedding ON leads USING ivfflat (embedding vector_cosine_ops)")
 
     # Add missing columns from model
+    op.add_column("leads", sa.Column("source", sa.String(length=64), nullable=True))
     op.add_column("leads", sa.Column("company_domain", sa.String(length=255), nullable=True))
     op.add_column("leads", sa.Column("source_url", sa.Text(), nullable=True))
     op.add_column("leads", sa.Column("source_actor", sa.String(length=100), nullable=True))

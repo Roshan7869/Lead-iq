@@ -4,6 +4,7 @@ Usage: `async with get_db_session() as session:`
 """
 from __future__ import annotations
 
+import os
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
@@ -14,14 +15,18 @@ from backend.shared.config import settings
 
 from sqlalchemy.pool import NullPool
 
-# Force Supavisor transaction pooler — port 6543 not 5432
+# Support Supavisor transaction pooler override via DISABLE_SUPAVISOR_PORT env
+_use_supavisor = os.getenv("DISABLE_SUPAVISOR_PORT", "").lower() not in ("1", "true", "yes")
 _raw_url = settings.DATABASE_URL
-_db_url = (
-    _raw_url
-    .replace("postgresql://", "postgresql+asyncpg://")
-    .replace(":5432/", ":6543/")
-    .replace(":5433/", ":6543/")
-)
+if _use_supavisor:
+    _db_url = (
+        _raw_url
+        .replace("postgresql://", "postgresql+asyncpg://")
+        .replace(":5432/", ":6543/")
+        .replace(":5433/", ":6543/")
+    )
+else:
+    _db_url = _raw_url.replace("postgresql://", "postgresql+asyncpg://")
 
 engine = create_async_engine(
     _db_url,

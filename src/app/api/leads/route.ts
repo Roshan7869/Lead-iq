@@ -14,11 +14,11 @@ export async function GET(req: NextRequest) {
       });
       if (res.ok) {
         const data = await res.json();
-        if (Array.isArray(data.leads) && data.leads.length > 0) {
+        if (Array.isArray(data.leads)) {
           return NextResponse.json(data);
         }
       }
-    } catch { /* backend unavailable — fall back to demo */ }
+    } catch { /* backend unavailable — fall back to demo */}
   }
-  return NextResponse.json({ leads: demoLeads });
+  return NextResponse.json({ leads: demoLeads, isFallback: true });
 }

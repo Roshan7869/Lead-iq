@@ -4,13 +4,15 @@ Single source of truth — import `settings` everywhere, never os.getenv directl
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import timezone, UTC
 from typing import Any
 
+from pydantic import ConfigDict
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
+    model_config = ConfigDict(env_file=".env", case_sensitive=True)
     # ── Server ────────────────────────────────────────────────────────────────
     APP_NAME: str = "LeadIQ"
     DEBUG: bool = False
@@ -52,6 +54,15 @@ class Settings(BaseSettings):
     REDDIT_USER_AGENT: str = "LeadIQ/1.0"
     TWITTER_BEARER_TOKEN: str = ""
     GITHUB_TOKEN: str = ""
+    GROQ_API_KEY: str = ""
+    OPENROUTER_API_KEY: str = ""
+    NVIDIA_API_KEY: str = ""
+    NEO4J_URI: str = "bolt://localhost:7687"
+    NEO4J_USER: str = "neo4j"
+    NEO4J_PASS: str = ""  # Must be set in production
+    OLLAMA_BASE_URL: str = "http://localhost:11434"
+    OLLAMA_MODEL: str = "phi3:mini"
+    OLLAMA_CLOUD_URL: str = ""
 
     # ── Enrichment API Keys ───────────────────────────────────────────────────
     HUNTER_API_KEY: str = ""       # Hunter.io email finder
@@ -76,21 +87,48 @@ class Settings(BaseSettings):
     RATE_LIMIT_AUTH: str = "10/minute"
     RATE_LIMIT_EXPENSIVE: str = "5/minute"
 
+    # ── Gemini Token Budget (Day 10: Cost Stable) ──────────────────────────────
+    GEMINI_DAILY_BUDGET: int = 2_000_000
+    GEMINI_HOURLY_BUDGET: int = 83_333      # 2M / 24 hours
+    GEMINI_QUEUE_STREAM: str = "leadiq:gemini:queue"
+    GEMINI_QUEUE_MAX_SIZE: int = 500
+
+    # ── Source Quality (Day 11: Source Audit) ──────────────────────────────────
+    DISABLED_SOURCES: str = ""              # comma-separated, e.g. "twitter,rss"
+    SOURCE_QUALIFICATION_THRESHOLD: float = 0.15
+    SOURCE_AUDIT_WINDOW_DAYS: int = 7
+
     # ── MCP ─────────────────────────────────────────────────────────────────
-    MCP_API_KEY: str = ""  # Optional: protect /mcp endpoint; empty = dev mode (no auth)
+    MCP_API_KEY: str = ""  # Must be set in production; empty = reject all requests
 
     # ── Observability ─────────────────────────────────────────────────────────
     SENTRY_DSN: str = ""
     LOG_LEVEL: str = "INFO"
 
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
-
     # ── Helper Methods ─────────────────────────────────────────────────────────
+    @property
+    def disabled_sources(self) -> set[str]:
+        """Parsed disabled source names (comma-separated DISABLED_SOURCES)."""
+        return {s.strip() for s in self.DISABLED_SOURCES.split(",") if s.strip()}
+
+    def validate_production_requirements(self) -> None:
+        """Fail fast for unsafe production configuration."""
+        if self.DEBUG:
+            return
+        if not self.SECRET_KEY or len(self.SECRET_KEY) < 32:
+            raise ValueError("SECRET_KEY must be set and at least 32 characters in production.")
+        if not self.JWT_SECRET_KEY or len(self.JWT_SECRET_KEY) < 32:
+            raise ValueError("JWT_SECRET_KEY must be set and at least 32 characters in production.")
+        if not self.ADMIN_PASSWORD:
+            raise ValueError("ADMIN_PASSWORD must be set in production.")
+        if not self.ALLOWED_ORIGINS:
+            raise ValueError("ALLOWED_ORIGINS cannot be empty in production.")
+        if "*" in self.ALLOWED_ORIGINS:
+            raise ValueError("ALLOWED_ORIGINS cannot contain '*' in production.")
+
     def get_timezone(self) -> timezone:
         """Get the configured timezone (default UTC)."""
-        return timezone.utc
+        return UTC
 
     def model_dump(self, **kwargs: Any) -> dict[str, Any]:
         """Compatibility shim for Pydantic v1/v2 dump."""

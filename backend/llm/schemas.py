@@ -121,7 +121,7 @@ class AnalyzedLead(BaseModel):
     # ── Colvin Validator Logic (3 rules) ───────────────────────────────────────
 
     @model_validator(mode="after")
-    def validate_confidence_evidence(self) -> "AnalyzedLead":
+    def validate_confidence_evidence(self) -> AnalyzedLead:
         """
         Rule 1: High confidence (>0.7) requires evidence in enrichment fields.
         High confidence without supporting data is suspicious - downgrade.
@@ -135,7 +135,7 @@ class AnalyzedLead(BaseModel):
         return self
 
     @model_validator(mode="after")
-    def validate_opportunity_threshold(self) -> "AnalyzedLead":
+    def validate_opportunity_threshold(self) -> AnalyzedLead:
         """
         Rule 2: Opportunity rejected if confidence <0.35.
         Low-confidence opportunities are noise, not signals.

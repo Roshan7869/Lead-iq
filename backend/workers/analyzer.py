@@ -21,23 +21,22 @@ import asyncio
 import json
 import logging
 import re
-import uuid
-from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any
 
-from backend.llm.cost_guard import check_budget
+from backend.llm.cost_guard import check_budget, consume_budget, queue_for_later
 from backend.llm.gemini_service import GeminiExtractionError
 from backend.llm.schemas import AnalyzedLead
-from backend.llm.SOURCE_PROMPTS import INDIA_SIGNALS_LOOKUP, _build_prompt
+from backend.llm.SOURCE_PROMPTS import _build_prompt
 from backend.shared.config import settings
 from backend.shared.stream import redis_stream
+from backend.workers.outreach_scorer import gate_outreach
+from backend.workers.source_metrics import record_post as record_source_quality
 
 from backend.shared.db import get_db_session
 from backend.shared.repository import PostRepo, LeadRepo, QuotaRepo
 from hashlib import sha256
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from sqlalchemy import select
 
 logger = logging.getLogger(__name__)
 
@@ -329,12 +328,19 @@ class GeminiAnalyzer:
 
         # Stage 1: Budget Gate
         if not await check_budget(estimated_tokens):
-            logger.warning("gemini_budget_exceeded", fallback="heuristic")
+            logger.warning("gemini_budget_exhausted, queuing for later")
+            await queue_for_later(
+                "analyze_lead",
+                {"url": url, "source": source, "text_snippet": text[:500]},
+            )
             return self._heuristic_classify(text, mode)
 
         # Stage 2 & 3: Prompt Construction + Async API Call
         try:
             response_text, tokens_used = await _call_gemini_async(prompt, self._model)
+
+            # Record actual usage after successful Gemini call
+            await consume_budget(tokens_used)
 
             # Stage 4: Parse + Validate
             data = _parse_json(response_text)
@@ -346,6 +352,19 @@ class GeminiAnalyzer:
                 "analyzed_at": datetime.now(UTC),
             })
             result = AnalyzedLead.model_validate(data)
+
+            # Stage 4.5: Outreach Quality Gate (Day 20)
+            if result.outreach_draft:
+                gated_draft, specificity_score = gate_outreach(
+                    result.outreach_draft, text, result.intent
+                )
+                result = result.model_copy(update={"outreach_draft": gated_draft})
+                if gated_draft is None:
+                    logger.info("outreach_refused lead analysis, score=%.2f", specificity_score)
+
+            # Stage 4.6: Record source quality metric (Day 11)
+            if source:
+                await record_source_quality(source, result.is_opportunity)
 
             # Stage 5: Audit Stamp (already done in validate)
             # Stage 6: Structured Log

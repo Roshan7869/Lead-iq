@@ -11,7 +11,6 @@ Usage:
 """
 from __future__ import annotations
 
-import asyncio
 from typing import Any
 
 from backend.shared.stream import redis_stream
@@ -63,6 +62,12 @@ class IngestionOrchestrator:
             try:
                 posts = await collector.collect()
                 logger.info("Collector %s returned %d posts", collector.source, len(posts))
+
+                if len(posts) == 0:
+                    logger.warning(
+                        "Collector %s returned 0 posts — possible selector rot or site blocking",
+                        collector.source,
+                    )
 
                 for post in posts:
                     # Check deduplication

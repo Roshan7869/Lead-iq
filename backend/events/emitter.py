@@ -3,7 +3,7 @@ Domain event emitter - Redis Streams for events
 """
 import json
 import structlog
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 
 logger = structlog.get_logger()
 _r = None
@@ -33,6 +33,6 @@ async def emit(event_type: str, payload: dict, maxlen: int = 50_000):
     await _r.xadd(stream, {
         "event_type": event_type,
         "payload": json.dumps(payload),
-        "emitted_at": datetime.now(timezone.utc).isoformat(),
+        "emitted_at": datetime.now(UTC).isoformat(),
     }, maxlen=maxlen)
     logger.info("event_emitted", type=event_type, stream=stream)

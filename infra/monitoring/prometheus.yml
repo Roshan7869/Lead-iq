@@ -1,0 +1,66 @@
+# Prometheus configuration for LeadIQ monitoring
+# Scrapes backend, Redis, and PostgreSQL metrics
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+
+# Alerting rules (optional — enable when alertmanager is configured)
+# rule_files:
+#   - "alerts/*.yml"
+
+scrape_configs:
+  # ── Backend API (FastAPI /metrics endpoint) ────────────────────────────
+  - job_name: "leadiq-backend"
+    static_configs:
+      - targets: ["localhost:8000"]
+    metrics_path: "/metrics"
+    scheme: http
+    scrape_interval: 15s
+    scrape_timeout: 10s
+    # Add a label to identify the environment
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: "backend"
+
+  # ── Redis exporter ─────────────────────────────────────────────────────
+  # Requires: https://github.com/oliver006/redis_exporter
+  # Run: docker run -p 9121:9121 oliver006/redis_exporter
+  - job_name: "leadiq-redis"
+    static_configs:
+      - targets: ["localhost:9121"]
+    metrics_path: "/metrics"
+    scheme: http
+    scrape_interval: 15s
+    scrape_timeout: 10s
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: "redis"
+
+  # ── PostgreSQL exporter ────────────────────────────────────────────────
+  # Requires: https://github.com/prometheus-community/postgres_exporter
+  # Run: docker run -p 9187:9187 -e DATA_SOURCE_NAME="postgresql://..." prometheuscommunity/postgres-exporter
+  - job_name: "leadiq-postgres"
+    static_configs:
+      - targets: ["localhost:9187"]
+    metrics_path: "/metrics"
+    scheme: http
+    scrape_interval: 15s
+    scrape_timeout: 10s
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: "postgres"
+
+  # ── Node exporter (host-level metrics) ─────────────────────────────────
+  # Requires: https://github.com/prometheus/node_exporter
+  - job_name: "leadiq-node"
+    static_configs:
+      - targets: ["localhost:9100"]
+    metrics_path: "/metrics"
+    scheme: http
+    scrape_interval: 30s
+    scrape_timeout: 10s

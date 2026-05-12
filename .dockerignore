@@ -1,0 +1,22 @@
+# Exclude secrets and build artifacts
+.env*
+!.env.example
+.git/
+node_modules/
+.next/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+*.md
+docs/
+eval/
+output/
+scripts/
+tests/
+workers/
+*.log
+.gitignore
+Dockerfile*
+docker-compose*
+README.md

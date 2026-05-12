@@ -13,7 +13,6 @@ export default function ROITrackerPage() {
   const revenue = leads.filter(l => l.stage === 'closed').reduce((s, l) => s + l.estimatedValue, 0);
   const pipeline = leads.filter(l => l.stage !== 'closed').reduce((s, l) => s + l.estimatedValue, 0);
   const cost = 1600;
-  const net = revenue - cost;
   const multiplier = revenue > 0 ? (revenue / cost).toFixed(0) : '0';
 
   const funnelData = STAGES.map((stage) => ({

@@ -18,6 +18,8 @@ ACTOR_FLAGS = {
     "github": "actors:github:enabled",
     "hn": "actors:hn:enabled",
     "producthunt": "actors:producthunt:enabled",
+    "naukri": "actors:naukri:enabled",
+    "internshala": "actors:internshala:enabled",
 }
 
 

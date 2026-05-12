@@ -6,7 +6,35 @@ on:
   pull_request:
 
 jobs:
-  frontend:
+  frontend-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install frontend dependencies
+        run: npm ci
+      - name: Run frontend lint
+        run: npm run lint
+
+  frontend-typecheck:
+    needs: [frontend-lint]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install frontend dependencies
+        run: npm ci
+      - name: Run TypeScript typecheck
+        run: npx tsc --noEmit
+
+  frontend-test:
+    needs: [frontend-typecheck]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,7 +49,37 @@ jobs:
       - name: Build Next.js app
         run: npm run build
 
-  backend:
+  backend-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+      - name: Sync backend dev dependencies
+        run: uv sync --project backend --extra dev
+      - name: Run backend lint
+        run: uv run --project backend ruff check backend
+
+  backend-typecheck:
+    needs: [backend-lint]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+      - name: Sync backend dev dependencies
+        run: uv sync --project backend --extra dev
+      - name: Run backend typecheck
+        run: uv run --project backend mypy backend
+
+  backend-test:
+    needs: [backend-typecheck]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

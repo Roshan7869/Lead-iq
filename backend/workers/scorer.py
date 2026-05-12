@@ -28,6 +28,7 @@ Score-band thresholds (applied to base score):
 from __future__ import annotations
 
 import logging
+import uuid
 from dataclasses import dataclass
 
 from backend.shared.config import settings

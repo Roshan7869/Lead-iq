@@ -31,7 +31,7 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
-from enum import Enum as PyEnum
+from enum import StrEnum
 
 from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, String, Text
 from sqlalchemy.dialects.postgresql import UUID
@@ -40,7 +40,7 @@ from sqlalchemy.orm import relationship
 from backend.shared.db import Base
 
 
-class LeadEventType(str, PyEnum):
+class LeadEventType(StrEnum):
     """Types of events that can occur on a lead."""
 
     approved = "approved"

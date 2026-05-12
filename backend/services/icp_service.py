@@ -25,10 +25,8 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.llm.cost_guard import check_budget
-from backend.llm.gemini_service import parse_natural_language_icp
 from backend.models.icp import ICP
-from backend.models.lead import Lead
+from backend.shared.models import Lead
 from backend.shared.stream import redis_stream
 
 logger = structlog.get_logger()
@@ -59,6 +57,7 @@ async def parse_icp(description: str) -> dict[str, Any]:
     Parse natural language ICP description into structured format.
 
     Uses Gemini Flash for natural language understanding.
+    Lazy-imports from gemini_service to avoid GCP auth at import time.
 
     Example:
         Input: "CTOs at Indian SaaS startups 20-200 employees using React"
@@ -71,6 +70,7 @@ async def parse_icp(description: str) -> dict[str, Any]:
             "funding_stages": ["series-a"],
         }
     """
+    from backend.llm.gemini_service import parse_natural_language_icp
     return await parse_natural_language_icp(description)
 
 
@@ -237,7 +237,6 @@ async def find_matching_leads(
 
     # pgvector semantic search
     try:
-        from pgvector.sqlalchemy import Vector
 
         result = await session.execute(
             select(Lead, Lead.embedding.cosine_distance(icp_embedding).label("semantic_dist"))

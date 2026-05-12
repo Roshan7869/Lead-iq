@@ -28,7 +28,6 @@ from vertexai.generative_models import GenerativeModel, GenerationConfig, Part
 
 from backend.llm.cost_guard import check_budget
 from backend.llm.SOURCE_PROMPTS import SOURCE_PROMPTS, get_generic_prompt
-from backend.shared.config import settings
 
 logger = structlog.get_logger()
 
@@ -107,18 +106,37 @@ async def extract_lead(
     # Get source-specific prompt
     prompt = SOURCE_PROMPTS.get(source, get_generic_prompt())
 
-    # Build full prompt
+    # Get source-specific examples if available
+    from backend.llm.SOURCE_PROMPTS import EXTRACTION_EXAMPLES
+    examples = EXTRACTION_EXAMPLES.get(source, [])
+    examples_block = ""
+    if examples:
+        examples_block = "\n\nEXAMPLES:\n"
+        for i, ex in enumerate(examples[:2], 1):
+            examples_block += f"\nExample {i}:\nInput: {ex['input'][:200]}...\nOutput: {json.dumps(ex['output'])}\n"
+
+    # Build schema-injected prompt
     full_prompt = f"""{prompt}
 
 URL: {url}
 
 Extract the company/lead information from the following content.
-Return ONLY a valid JSON object with the extracted fields.
-If a field cannot be found, use null (never guess).
+Return ONLY a valid JSON object matching this exact schema:
+{json.dumps(LEAD_EXTRACTION_SCHEMA, indent=2)}
 
-Content:
-{markdown_content[:50000]}  # Truncate to avoid context limit
-"""
+RULES:
+- If a field cannot be found in the content, use null (never guess or infer)
+- company_size must be one of: 1-10, 11-50, 51-200, 201-500, 500+
+- funding_stage must be one of: bootstrapped, pre-seed, seed, series-a, series-b, series-c, public
+- tech_stack should be an array of technology names found in the content
+- email should only be included if explicitly visible in the content
+- Return ONLY the JSON object, no markdown, no explanations
+{examples_block}
+
+Content to extract from:
+{markdown_content[:30000]}  # Truncate to avoid context limit
+
+EXTRACTED JSON:"""
 
     try:
         model = GenerativeModel(MODELS["extract"])
@@ -182,20 +200,102 @@ async def regex_fallback_extract(
         "confidence": 0.30,  # Low confidence for regex fallback
     }
 
-    # Extract company name (first H1 or title)
-    h1_match = re.search(r"^#\s+(.+)$", markdown_content, re.MULTILINE)
+    text = markdown_content
+
+    # Extract company name (first H1 or bold heading, or title tag)
+    h1_match = re.search(r"^#\s+(.+)$", text, re.MULTILINE)
+    title_match = re.search(r"<title>([^<]+)</title>", text, re.IGNORECASE)
     if h1_match:
         result["company_name"] = h1_match.group(1).strip()
+    elif title_match:
+        result["company_name"] = title_match.group(1).strip().split(" - ")[0].split(" | ")[0]
+
+    # Extract industry from common keywords
+    industry_keywords = {
+        "SaaS": ["saas", "software as a service", "cloud software"],
+        "Fintech": ["fintech", "financial technology", "payments", "banking"],
+        "HealthTech": ["healthtech", "healthcare", "medical", "digital health"],
+        "AI/ML": ["artificial intelligence", "machine learning", "ai/ml", "deep learning"],
+        "E-commerce": ["e-commerce", "ecommerce", "online store", "marketplace"],
+        "EdTech": ["edtech", "education technology", "learning platform"],
+        "Consumer Tech": ["consumer", "b2c", "mobile app"],
+        "Developer Tools": ["developer tools", "devops", "api", "sdk"],
+    }
+    text_lower = text.lower()
+    for industry, keywords in industry_keywords.items():
+        if any(kw in text_lower for kw in keywords):
+            result["industry"] = industry
+            break
+
+    # Extract location
+    location_patterns = [
+        r"(?:Headquarters|Location|Based in|Office):\s*([^\n<]+)",
+        r"([A-Z][a-z]+(?:\s[A-Z][a-z]+)*),\s*([A-Z]{2,})\s*\d{5}?",
+    ]
+    for pattern in location_patterns:
+        loc_match = re.search(pattern, text)
+        if loc_match:
+            result["location"] = loc_match.group(1).strip()
+            break
+
+    # Extract company size
+    size_patterns = [
+        r"(\d{1,3})\s*(?:employees?|staff|people|team members?)",
+        r"(1-10|11-50|51-200|201-500|500\+)",
+    ]
+    for pattern in size_patterns:
+        size_match = re.search(pattern, text, re.IGNORECASE)
+        if size_match:
+            result["company_size"] = size_match.group(1).strip()
+            break
+
+    # Extract funding stage
+    funding_patterns = [
+        r"(seed|series\s*[abc]|pre-seed|bootstrapped|angel|ipo|public)",
+        r"(Series\s+[ABC])",
+    ]
+    for pattern in funding_patterns:
+        fund_match = re.search(pattern, text, re.IGNORECASE)
+        if fund_match:
+            result["funding_stage"] = fund_match.group(1).lower().replace(" ", "-")
+            break
+
+    # Extract tech stack from common technologies
+    tech_keywords = [
+        "React", "Vue.js", "Angular", "Next.js", "Node.js", "Python", "Django",
+        "FastAPI", "Flask", "Ruby", "Rails", "Go", "Rust", "Java", "Spring",
+        "PHP", "Laravel", "TypeScript", "JavaScript", "C++", "C#", "Swift",
+        "Kotlin", "Flutter", "React Native", "AWS", "GCP", "Azure", "Docker",
+        "Kubernetes", "Terraform", "PostgreSQL", "MySQL", "MongoDB", "Redis",
+        "Elasticsearch", "GraphQL", "REST", "gRPC", "WebSocket", "TensorFlow",
+        "PyTorch", "Scikit-learn", "Pandas", "NumPy", "Apache Spark", "Hadoop",
+        "Kafka", "RabbitMQ", "Nginx", "Apache", "Linux", "Ubuntu", "Debian",
+    ]
+    found_tech = []
+    for tech in tech_keywords:
+        if re.search(rf"\b{re.escape(tech)}\b", text, re.IGNORECASE):
+            found_tech.append(tech)
+    if found_tech:
+        result["tech_stack"] = found_tech[:8]  # Limit to top 8
 
     # Extract email
-    email_match = re.search(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", markdown_content)
+    email_match = re.search(
+        r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", text
+    )
     if email_match:
         result["email"] = email_match.group(0)
 
     # Extract website
-    url_match = re.search(r"https?://[^\s\)]+", markdown_content)
-    if url_match:
-        result["website"] = url_match.group(0)
+    website_match = re.search(r"https?://([^\s\)\"]+)", text)
+    if website_match:
+        result["website"] = website_match.group(0)
+
+    # Extract founded year
+    year_match = re.search(r"(?:Founded|Established|Incorporated)\s*(?:in)?\s*(\d{4})", text, re.IGNORECASE)
+    if not year_match:
+        year_match = re.search(r"\b(19\d{2}|20\d{2})\b", text)
+    if year_match:
+        result["founded_year"] = int(year_match.group(1))
 
     logger.info("regex_fallback_used", source=source, company=result.get("company_name"))
     return result
@@ -360,7 +460,7 @@ def compute_confidence(lead: dict[str, Any], source: str) -> float:
         - indimart: 0.50 (user-submitted B2B directory, often stale)
         - llm_web_scrape: 0.40 (generic LLM extraction, needs validation)
     """
-    from backend.services.confidence import SOURCE_TRUST, FIELD_WEIGHTS, compute_field_score
+    from backend.services.confidence import SOURCE_TRUST, compute_field_score
 
     source_trust = SOURCE_TRUST.get(source, 0.40)
     field_score = compute_field_score(lead)

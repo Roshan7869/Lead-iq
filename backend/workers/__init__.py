@@ -43,5 +43,8 @@ __all__ = [
     "refresh_intent_signals",
     "compute_daily_metrics",
     "process_dlq_retries",
-    # Actor tasks (using task function names from actors module)
+    # Actor tasks
+    "collect_github_task",
+    "search_github_india_task",
+    "monitor_telegram_task",
 ]

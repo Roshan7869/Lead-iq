@@ -2,6 +2,7 @@
 
 import { useState, createContext, useContext, ReactNode, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { Lead, BackendLead } from '@/types/lead';
 import { mapBackendLeadsToLeads } from '@/lib/lead-mapper';
 import { getAuthHeader } from '@/lib/auth-client';
@@ -64,6 +65,14 @@ export function LeadProvider({ children }: { children: ReactNode }) {
     refetchOnWindowFocus: false,
   });
 
+  // Show toast on API errors
+  if (error) {
+    toast.error(`Leads fetch failed: ${error.message}`, {
+      description: 'Please check your connection or try again.',
+      duration: 5000,
+    });
+  }
+
   const refreshLeads = useCallback(async () => {
     await refetch();
   }, [refetch]);
@@ -73,6 +82,10 @@ export function LeadProvider({ children }: { children: ReactNode }) {
       patchLead(id, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['leads'] });
+      toast.success('Lead updated successfully');
+    },
+    onError: (error: Error) => {
+      toast.error(`Update failed: ${error.message}`);
     },
   });
 

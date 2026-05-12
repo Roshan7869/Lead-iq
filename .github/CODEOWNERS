@@ -1,0 +1,9 @@
+# Require review for security-critical files
+.github/workflows/ @leadiq-core
+.github/CODEOWNERS @leadiq-core
+Dockerfile* @leadiq-core
+infra/Dockerfile* @leadiq-core
+infra/docker-compose*.yml @leadiq-core
+railway.toml @leadiq-core
+vercel.json @leadiq-core
+render.yaml @leadiq-core

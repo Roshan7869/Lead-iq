@@ -4,11 +4,9 @@ Lead-iq Council of Skills — Brutal Audit Script v1.0
 17 Experts | 6 Guilds | Zero Tolerance Mode
 Run from project root: python audit/council_audit.py
 """
-import ast, os, re, sys, json, subprocess, time
+import re, json, time
 from pathlib import Path
 from dataclasses import dataclass, field
-from typing import Optional
-from collections import defaultdict
 
 R  = "\033[91m"; Y  = "\033[93m"; G  = "\033[92m"; B  = "\033[94m"
 M  = "\033[95m"; C  = "\033[96m"; W  = "\033[97m"
@@ -543,14 +541,14 @@ routes_all = " ".join(read(f) for f in py_files("backend"))
 unauth = re.findall(r'@router\.post\(["\'][^"\']*run[^"\']*["\']', routes_all)
 check(len(unauth) == 0, f"No unprotected /run-* endpoints (found {len(unauth)})", g5, 5,
       "CRITICAL", "Security", "UNPROTECTED_ENDPOINTS",
-      f"/run-miner or /run-ai without auth: anyone can trigger Gemini and burn your credit.",
+      "/run-miner or /run-ai without auth: anyone can trigger Gemini and burn your credit.",
       fix="Add Depends(get_current_user) to every /run-* route")
 
 fstring_sql = find_pattern(
     r'f["\'].*(?:SELECT|INSERT|UPDATE|DELETE|WHERE)', ["backend", "workers"], "*.py")
 check(len(fstring_sql) == 0, f"No f-string SQL (injection risk — found {len(fstring_sql)})", g5, 4,
       "CRITICAL", "Security", "SQL_INJECTION",
-      f"F-string SQL = SQL injection vulnerability.",
+      "F-string SQL = SQL injection vulnerability.",
       fix="Use SQLAlchemy ORM or parameterized text(query).bindparams()")
 for f, ln, c in fstring_sql[:2]:
     print(f"      {R}  -> {f}:{ln}: {c[:80]}{RST}")
@@ -736,7 +734,7 @@ GUILD_LABELS = [
 
 print(f"  {'Guild':<50} Score  Max   %    Bar")
 print(f"  {'-'*80}")
-for g, label in zip(all_guilds, GUILD_LABELS):
+for g, label in zip(all_guilds, GUILD_LABELS, strict=True):
     p    = int(g.score / g.max * 100) if g.max else 0
     bar  = "#" * int(p/5) + "-" * (20 - int(p/5))
     col  = G if p >= 75 else (Y if p >= 50 else R)

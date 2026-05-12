@@ -11,11 +11,9 @@ import ast
 import json
 import re
 import sys
-from datetime import timezone
 from pathlib import Path
-from typing import Any
 
-from datetime import datetime
+from datetime import datetime, UTC
 
 # ANSI Color Palette
 GREEN = "\033[92m"
@@ -56,7 +54,7 @@ def sub(msg: str) -> str:
 # AUDIT STATE
 # ============================================================================
 audit_results = {
-    "run_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+    "run_at": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
     "project_root": None,
     "tasks": {
         "1.1_schema": {"checks": [], "score": 0, "max": 0},
@@ -181,7 +179,7 @@ def audit_task_1_1() -> None:
             record("1.1_schema", "skipped_check", False, "File missing", "Colvin")
         return
 
-    print(ok(f"File found: backend/llm/schemas.py"))
+    print(ok("File found: backend/llm/schemas.py"))
     record("1.1_schema", "file_exists", True)
 
     source = read_source(schema_path)
@@ -526,7 +524,7 @@ def audit_task_1_3() -> None:
         record("1.3_prompt", "file_exists", False)
         return
 
-    print(ok(f"File found: SOURCE_PROMPTS.py"))
+    print(ok("File found: SOURCE_PROMPTS.py"))
     record("1.3_prompt", "file_exists", True)
 
     source = read_source(source_prompts_path)
@@ -745,7 +743,7 @@ if __name__ == "__main__":
     print("  ║  Tasks: 1.1 Schema · 1.2 Analyzer · 1.3 Prompt          ║")
     print("  ╚══════════════════════════════════════════════════════════╝")
     print(f"  Project root: {ROOT}")
-    print(f"  Audit time:   {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')} UTC")
+    print(f"  Audit time:   {datetime.now(UTC).strftime('%Y-%m-%d %H:%M:%S')} UTC")
     print(f"{RESET}")
 
     audit_task_1_1()

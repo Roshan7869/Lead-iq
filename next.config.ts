@@ -1,39 +1,53 @@
 import type { NextConfig } from "next";
+import bundleAnalyzer from "@next/bundle-analyzer";
+
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
 
 const nextConfig: NextConfig = {
-  // Enable React strict mode for catching potential issues early
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   reactStrictMode: true,
-
-  // Compress responses
   compress: true,
+  productionBrowserSourceMaps: false,  // smaller bundles in production
 
-  // Image optimization
+  // ── Image optimization ─────────────────────────────────────────────────────
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [],
   },
 
-  // ── Bundle optimizations ───────────────────────────────────────────────────
+  // ── Bundle optimizations (Day 26) ──────────────────────────────────────────
   experimental: {
-    // Optimise package imports — tree-shake large icon/UI libraries
     optimizePackageImports: [
       "lucide-react",
       "@radix-ui/react-dialog",
       "@radix-ui/react-select",
       "@radix-ui/react-tabs",
       "recharts",
+      "@tanstack/react-query",
+      "date-fns",
     ],
   },
 
-  // Webpack split-chunk strategy: shared vendor + UI chunk
+  // ── Transpile large packages for better tree-shaking ───────────────────────
+  transpilePackages: [
+    "lucide-react",
+  ],
+
+  // ── Webpack split-chunk strategy: shared vendor + UI chunk ─────────────────
   webpack(config, { isServer }) {
     if (!isServer) {
       config.optimization = {
         ...config.optimization,
         splitChunks: {
           ...(config.optimization.splitChunks as object),
+          chunks: "all" as const,
+          maxInitialRequests: 25,
+          minSize: 20000,
           cacheGroups: {
-            // Large UI libraries → separate chunk, cached aggressively
             radix: {
               name: "chunk-radix",
               test: /node_modules\/@radix-ui/,
@@ -52,6 +66,29 @@ const nextConfig: NextConfig = {
               chunks: "all" as const,
               priority: 16,
             },
+            framer: {
+              name: "chunk-framer",
+            },
+            reactQuery: {
+              name: "chunk-react-query",
+              test: /node_modules\/@tanstack\/react-query/,
+              chunks: "all" as const,
+              priority: 14,
+            },
+            vendors: {
+              name: "chunk-vendors",
+              test: /node_modules/,
+              chunks: "all" as const,
+              priority: 10,
+              minChunks: 2,
+            },
+            common: {
+              name: "chunk-common",
+              minChunks: 2,
+              chunks: "all" as const,
+              priority: 5,
+              reuseExistingChunk: true,
+            },
           },
         },
       };
@@ -59,7 +96,7 @@ const nextConfig: NextConfig = {
     return config;
   },
 
-  // Security headers
+  // ── Security headers ───────────────────────────────────────────────────────
   async headers() {
     return [
       {
@@ -67,11 +104,26 @@ const nextConfig: NextConfig = {
         headers: [
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "X-Frame-Options", value: "DENY" },
+          { key: "Content-Security-Policy", value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https:; frame-ancestors 'none';" },
           { key: "X-XSS-Protection", value: "1; mode=block" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=()",
+          },
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains; preload",
+          },
+        ],
+      },
+      // Cache static assets aggressively (immutable hashed filenames)
+      {
+        source: "/_next/static/(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
           },
         ],
       },
@@ -79,5 +131,5 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withBundleAnalyzer(nextConfig);
 

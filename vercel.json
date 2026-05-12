@@ -2,5 +2,20 @@
   "framework": "nextjs",
   "buildCommand": "npm run build",
   "outputDirectory": ".next",
-  "installCommand": "npm install --legacy-peer-deps"
+  "installCommand": "npm ci",
+  "devCommand": "npm run dev",
+  "github": {
+    "silent": false
+  },
+  "git": {
+    "deploymentEnabled": {
+      "main": true,
+      "staging": true
+    }
+  },
+  "env": {
+    "NEXT_PUBLIC_API_URL": "${NEXT_PUBLIC_API_URL}",
+    "NEXT_PUBLIC_ENV": "${NEXT_PUBLIC_ENV}"
+  },
+  "regions": ["bom1"]
 }

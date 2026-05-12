@@ -15,6 +15,7 @@ Usage:
 
     prompt = SOURCE_PROMPTS["tracxn"]
 """
+from typing import Any
 
 # ── Source-Specific Prompts ─────────────────────────────────────────────────────
 
@@ -269,6 +270,138 @@ FIELDS TO EXTRACT:
 
 CONFIDENCE CEILING: 0.40 (generic LLM extraction, needs validation)
 """
+
+
+# ── Extraction Examples (Few-shot learning) ───────────────────────────────────
+# Each example provides a concrete input/output pair for a source.
+# Used by gemini_service.py to improve extraction quality via in-context learning.
+
+EXTRACTION_EXAMPLES: dict[str, list[dict[str, Any]]] = {
+    "tracxn": [
+        {
+            "input": "CloudScale Technologies | Tracxn\nSector: Cloud Infrastructure\nLocation: Hyderabad, India\nEmployees: 51-200\nFunding Stage: Series A\nTotal Funding: $12M\nTech Stack: Kubernetes, Terraform, AWS\nFounded: 2021\n",
+            "output": {
+                "company_name": "CloudScale Technologies",
+                "industry": "Cloud Infrastructure",
+                "location": "Hyderabad, India",
+                "company_size": "51-200",
+                "funding_stage": "series-a",
+                "tech_stack": ["Kubernetes", "Terraform", "AWS"],
+                "email": None,
+                "website": None,
+                "founded_year": 2021,
+            }
+        }
+    ],
+    "github_profile": [
+        {
+            "input": "# Stripe\n@stripe\nPayments infrastructure for the internet.\nSan Francisco, CA | 5000+ employees\nLanguages: Ruby, Go, TypeScript\nWebsite: https://stripe.com\nEmail: press@stripe.com",
+            "output": {
+                "company_name": "Stripe",
+                "industry": "Fintech",
+                "location": "San Francisco, CA",
+                "company_size": "500+",
+                "funding_stage": "public",
+                "tech_stack": ["Ruby", "Go", "TypeScript"],
+                "email": "press@stripe.com",
+                "website": "https://stripe.com",
+            }
+        }
+    ],
+    "producthunt": [
+        {
+            "input": "Supabase — Open source Firebase alternative\nLaunched on Product Hunt\nMade by @kiwicopple\nCategories: Developer Tools, Open Source\nTech Stack: PostgreSQL, Elixir, Go\nUpvotes: 2,341",
+            "output": {
+                "company_name": "Supabase",
+                "industry": "Developer Tools",
+                "location": None,
+                "company_size": None,
+                "funding_stage": None,
+                "tech_stack": ["PostgreSQL", "Elixir", "Go"],
+                "email": None,
+                "website": None,
+            }
+        }
+    ],
+    "hacker_news": [
+        {
+            "input": "Ask HN: Who is hiring? (April 2025)\n\nCloudScale Technologies | Hyderabad, India | Remote OK\nWe are a Series A cloud infrastructure startup building Kubernetes tools.\nTech: Go, Kubernetes, AWS\nPositions: Backend Engineer, SRE\nApply: jobs@cloudscale.io",
+            "output": {
+                "company_name": "CloudScale Technologies",
+                "industry": "Cloud Infrastructure",
+                "location": "Hyderabad, India",
+                "company_size": None,
+                "funding_stage": "series-a",
+                "tech_stack": ["Go", "Kubernetes", "AWS"],
+                "email": "jobs@cloudscale.io",
+                "website": None,
+            }
+        }
+    ],
+    "yourstory": [
+        {
+            "input": "How HealthPlus Tech is transforming healthcare in India\nHeadquarters: Delhi NCR, India\nFounded: 2020\nTeam Size: 51-100\nSector: Healthcare IT\nFunding: Raised $5M in Seed round\nTech Stack: Vue.js, Django, AWS\nContact: hello@healthplus.tech",
+            "output": {
+                "company_name": "HealthPlus Tech",
+                "industry": "Healthcare IT",
+                "location": "Delhi NCR, India",
+                "company_size": "51-100",
+                "funding_stage": "seed",
+                "tech_stack": ["Vue.js", "Django", "AWS"],
+                "email": "hello@healthplus.tech",
+                "website": None,
+                "founded_year": 2020,
+            }
+        }
+    ],
+    "dpiit": [
+        {
+            "input": "Startup Name: AgriTech Solutions\nSector: Agriculture\nState: Punjab, India\nDPIIT Recognition Number: DIPP12345\nDate of Incorporation: 15-03-2022\nStage: Early Traction\nWebsite: www.agritechsolutions.in",
+            "output": {
+                "company_name": "AgriTech Solutions",
+                "industry": "Agriculture",
+                "location": "Punjab, India",
+                "company_size": None,
+                "funding_stage": None,
+                "tech_stack": [],
+                "email": None,
+                "website": "www.agritechsolutions.in",
+                "founded_year": 2022,
+            }
+        }
+    ],
+    "mca21": [
+        {
+            "input": "Company Name: INNOVATECH PRIVATE LIMITED\nCIN: U72200MH2021PTC123456\nPrincipal Business Activity: Software Development\nRegistered Office: Mumbai, Maharashtra\nDate of Incorporation: 10-01-2021\nDirectors: Rajesh Kumar (DIN: 01234567)\nStatus: Active",
+            "output": {
+                "company_name": "INNOVATECH PRIVATE LIMITED",
+                "industry": "Software Development",
+                "location": "Mumbai, Maharashtra",
+                "company_size": None,
+                "funding_stage": None,
+                "tech_stack": [],
+                "email": None,
+                "website": None,
+                "founded_year": 2021,
+            }
+        }
+    ],
+    "indimart": [
+        {
+            "input": "Shri Ganesh Enterprises - Manufacturer\nBusiness Type: Manufacturer, Supplier\nCity: Ahmedabad, Gujarat\nNumber of Employees: 11-50\nAnnual Turnover: ₹10-50 Cr\nProducts: Industrial Valves, Pipe Fittings",
+            "output": {
+                "company_name": "Shri Ganesh Enterprises",
+                "industry": "Manufacturing",
+                "location": "Ahmedabad, Gujarat",
+                "company_size": "11-50",
+                "funding_stage": None,
+                "tech_stack": [],
+                "email": None,
+                "website": None,
+            }
+        }
+    ],
+}
 
 
 # ── India-Specific Intent Signals (Karpathy: source vocabulary first) ───────────

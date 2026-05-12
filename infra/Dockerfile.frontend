@@ -1,12 +1,16 @@
 FROM node:20-alpine
 
+RUN addgroup -S leadiq && adduser -S leadiq -G leadiq
+
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm ci --only=production && npm cache clean --force
 
-COPY . .
+COPY --chown=leadiq:leadiq . .
 RUN npm run build
+
+USER leadiq
 
 EXPOSE 3000
 CMD ["npm", "start"]

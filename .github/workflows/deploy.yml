@@ -1,0 +1,158 @@
+# Deploy workflow for LeadIQ
+# Triggers on push to main: builds Docker images, deploys to Railway, verifies health.
+# Falls back automatically if the health check fails.
+
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "eval/**"
+      - "docs/**"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      # ── Checkout ──────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ── Set up Docker Buildx ──────────────────────────────────────────
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # ── Log in to container registry ──────────────────────────────────
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # ── Extract metadata for Docker tags ──────────────────────────────
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=ref,event=branch
+            type=sha,format=short
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      # ── Build and push backend Docker image ──────────────────────────
+      - name: Build and push backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: infra/Dockerfile.backend
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}-backend
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # ── Build and push frontend Docker image ─────────────────────────
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: infra/Dockerfile.frontend
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}-frontend
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Validate required deployment secrets
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_SERVICE_BACKEND: ${{ secrets.RAILWAY_SERVICE_BACKEND }}
+          BACKEND_HEALTHCHECK_URL: ${{ secrets.BACKEND_HEALTHCHECK_URL }}
+        run: |
+          test -n "$RAILWAY_TOKEN" || (echo "Missing RAILWAY_TOKEN" && exit 1)
+          test -n "$RAILWAY_SERVICE_BACKEND" || (echo "Missing RAILWAY_SERVICE_BACKEND" && exit 1)
+          test -n "$BACKEND_HEALTHCHECK_URL" || (echo "Missing BACKEND_HEALTHCHECK_URL" && exit 1)
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Capture rollback target
+        id: capture_rollback
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_SERVICE_BACKEND: ${{ secrets.RAILWAY_SERVICE_BACKEND }}
+        run: |
+          set +e
+          PREV_DEPLOY=$(railway status --service "$RAILWAY_SERVICE_BACKEND" --json | sed -n 's/.*"id":"\([^"]*\)".*/\1/p' | head -n1)
+          set -e
+          echo "previous_deployment_id=${PREV_DEPLOY}" >> "$GITHUB_OUTPUT"
+
+      # ── Deploy to Railway ─────────────────────────────────────────────
+      - name: Deploy to Railway
+        id: railway_deploy
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_SERVICE_BACKEND: ${{ secrets.RAILWAY_SERVICE_BACKEND }}
+        run: |
+          DEPLOY_OUT=$(railway up --service "$RAILWAY_SERVICE_BACKEND" --detach --ci)
+          echo "$DEPLOY_OUT"
+          DEPLOY_ID=$(echo "$DEPLOY_OUT" | sed -n 's/.*deployment[^0-9A-Za-z-]*\([0-9A-Za-z-]\{6,\}\).*/\1/p' | head -n1)
+          echo "deployment_id=${DEPLOY_ID}" >> "$GITHUB_OUTPUT"
+
+      # ── Health check ──────────────────────────────────────────────────
+      - name: Health check
+        id: health_check
+        env:
+          BACKEND_HEALTHCHECK_URL: ${{ secrets.BACKEND_HEALTHCHECK_URL }}
+        run: |
+          echo "Waiting for deployment to become ready..."
+          for i in $(seq 1 30); do
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+              "$BACKEND_HEALTHCHECK_URL" 2>/dev/null || echo "000")
+            if [ "$HTTP_CODE" = "200" ]; then
+              echo "Health check passed (HTTP 200)"
+              echo "healthy=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "Attempt $i: HTTP $HTTP_CODE — retrying in 10s..."
+            sleep 10
+          done
+          echo "Health check failed after 30 attempts"
+          echo "healthy=false" >> "$GITHUB_OUTPUT"
+          exit 1
+
+      # ── Rollback on failure ───────────────────────────────────────────
+      - name: Rollback on failure
+        if: ${{ failure() && steps.health_check.outputs.healthy == 'false' }}
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_SERVICE_BACKEND: ${{ secrets.RAILWAY_SERVICE_BACKEND }}
+        run: |
+          echo "Health check failed — initiating rollback..."
+          PREV="${{ steps.capture_rollback.outputs.previous_deployment_id }}"
+          if [ -n "$PREV" ]; then
+            railway rollback --service "$RAILWAY_SERVICE_BACKEND" --deployment "$PREV" || true
+            echo "Rollback attempted to deployment: $PREV"
+          else
+            echo "No previous deployment id found; manual rollback required."
+          fi

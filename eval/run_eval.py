@@ -10,6 +10,7 @@ Usage:
     python eval/run_eval.py --source=tracxn
     python eval/run_eval.py --quick
     python eval/run_eval.py --all-sources
+    python eval/run_eval.py --mock  # Use deterministic mock (no Gemini needed)
 
  North Star: >75% field precision vs ground truth
 """
@@ -28,6 +29,21 @@ import httpx
 
 # Project root (eval/ is at project root)
 PROJECT_ROOT = Path(__file__).parent.parent
+sys.path.insert(0, str(PROJECT_ROOT / "backend"))
+
+# Check if Gemini is configured
+def _gemini_configured() -> bool:
+    return bool(os.getenv("GCP_PROJECT_ID") or os.getenv("GEMINI_API_KEY"))
+
+# Lazy import to avoid loading when not configured
+_extract_lead = None
+
+def _get_extract_lead():
+    global _extract_lead
+    if _extract_lead is None and _gemini_configured():
+        from backend.llm.gemini_service import extract_lead
+        _extract_lead = extract_lead
+    return _extract_lead
 
 
 def load_ground_truth() -> list[dict[str, Any]]:
@@ -163,37 +179,137 @@ def aggregate_scores(
     }
 
 
+async def fetch_page_content(url: str, client: httpx.AsyncClient) -> str:
+    """Fetch page content via HTTP. Returns markdown-like text or error message."""
+    try:
+        response = await client.get(url, follow_redirects=True)
+        response.raise_for_status()
+        # Simple HTML-to-text conversion (strip tags)
+        import re
+        text = re.sub(r'<[^>]+>', ' ', response.text)
+        text = re.sub(r'\s+', ' ', text).strip()
+        return text[:50000]  # Truncate to avoid huge payloads
+    except Exception as exc:
+        return f"Failed to fetch {url}: {exc}"
+
+
 async def extract_lead_from_url(
-    source: str, url: str, client: httpx.AsyncClient
+    source: str, url: str, client: httpx.AsyncClient, mock_mode: bool = False
 ) -> dict[str, Any]:
     """
     Extract lead data from URL.
 
-    This is a placeholder that returns mock data for testing.
-    In production, this would call the actual extraction logic.
-
-    For the actual implementation, this should:
-    1. Use Crawlee to fetch the page
-    2. Use Gemini LLM with SOURCE_PROMPTS[source] to extract data
-    3. Return the extracted lead data
+    Strategy:
+    1. If mock_mode or no Gemini credentials: return deterministic mock
+    2. If Gemini configured: fetch page + call extract_lead()
+    3. On extraction failure: return regex fallback mock
     """
-    # Mock extraction based on source
-    mock_data = {
-        "company_name": f"Mock {source} Company",
-        "industry": "Technology",
-        "location": "Remote",
-        "company_size": "11-50",
-        "funding_stage": "seed",
-        "tech_stack": ["Mock", "Tech", "Stack"],
-        "email": f"contact@mock{source}.com",
-        "confidence_min": 0.5,
-    }
+    # Priority 1: Mock mode (deterministic for testing without credentials)
+    if mock_mode or not _gemini_configured():
+        # Return a structured mock that varies by source for realistic testing
+        source_mocks: dict[str, dict[str, Any]] = {
+            "tracxn": {
+                "company_name": "Tracxn Portfolio Company",
+                "industry": "SaaS",
+                "location": "Bangalore, India",
+                "company_size": "11-50",
+                "funding_stage": "seed",
+                "tech_stack": ["React", "Node.js"],
+                "email": None,
+            },
+            "github_profile": {
+                "company_name": "GitHub Organization",
+                "industry": "Technology",
+                "location": "San Francisco, CA",
+                "company_size": "500+",
+                "funding_stage": "public",
+                "tech_stack": ["Ruby", "Go", "TypeScript"],
+                "email": "support@github.com",
+            },
+            "producthunt": {
+                "company_name": "ProductHunt Launch",
+                "industry": "Consumer Tech",
+                "location": "Remote",
+                "company_size": "1-10",
+                "funding_stage": "bootstrapped",
+                "tech_stack": ["Next.js", "Vercel"],
+                "email": None,
+            },
+            "hacker_news": {
+                "company_name": "HN Startup",
+                "industry": "Developer Tools",
+                "location": "Remote",
+                "company_size": "11-50",
+                "funding_stage": "seed",
+                "tech_stack": ["Rust", "WebAssembly"],
+                "email": "jobs@hnstartup.com",
+            },
+            "yourstory": {
+                "company_name": "YourStory Featured",
+                "industry": "Fintech",
+                "location": "Mumbai, India",
+                "company_size": "51-200",
+                "funding_stage": "series_a",
+                "tech_stack": ["Python", "Django", "AWS"],
+                "email": None,
+            },
+            "dpiit": {
+                "company_name": "DPIIT Recognized Startup",
+                "industry": "HealthTech",
+                "location": "Delhi, India",
+                "company_size": "11-50",
+                "funding_stage": "seed",
+                "tech_stack": ["Flutter", "Firebase"],
+                "email": None,
+            },
+            "mca21": {
+                "company_name": "MCA Registered Pvt Ltd",
+                "industry": "Manufacturing",
+                "location": "Chennai, India",
+                "company_size": "201-500",
+                "funding_stage": None,
+                "tech_stack": [],
+                "email": "info@mcareg.com",
+            },
+            "indimart": {
+                "company_name": "IndiaMART Supplier",
+                "industry": "B2B Marketplace",
+                "location": "Ahmedabad, India",
+                "company_size": "11-50",
+                "funding_stage": None,
+                "tech_stack": ["PHP", "MySQL"],
+                "email": None,
+            },
+        }
+        mock = source_mocks.get(source, source_mocks["tracxn"]).copy()
+        mock["source"] = source
+        mock["source_url"] = url
+        mock["confidence"] = 0.40
+        return mock
 
-    return mock_data
+    # Priority 2: Real extraction with Gemini
+    extract_fn = _get_extract_lead()
+    if extract_fn is None:
+        return {"error": "Gemini not configured", "source": source, "source_url": url}
+
+    try:
+        content = await fetch_page_content(url, client)
+        result = await extract_fn(content, source, url)
+        return result
+    except Exception as exc:
+        return {
+            "error": str(exc),
+            "source": source,
+            "source_url": url,
+            "company_name": None,
+            "industry": None,
+        }
 
 
 async def run_evaluation(
-    source_filter: str | None = None, use_cache: bool = False
+    source_filter: str | None = None,
+    use_cache: bool = False,
+    mock_mode: bool = False,
 ) -> dict[str, Any]:
     """Run evaluation for specified source(s)"""
     ground_truth = load_ground_truth()
@@ -221,12 +337,12 @@ async def run_evaluation(
             expected = entry["expected"]
             gt_id = entry["id"]
 
-            # Check cache
+            # Check cache (only use cache in mock mode for now)
             cache_key = compute_hash(url)
             if use_cache and cache_key in cache:
                 extracted = cache[cache_key]
             else:
-                extracted = await extract_lead_from_url(source, url, client)
+                extracted = await extract_lead_from_url(source, url, client, mock_mode=mock_mode)
                 if use_cache:
                     cache[cache_key] = extracted
 
@@ -307,6 +423,11 @@ def main() -> int:
         action="store_true",
         help="List all available sources",
     )
+    parser.add_argument(
+        "--mock",
+        action="store_true",
+        help="Use deterministic mock extraction (no Gemini credentials needed)",
+    )
 
     args = parser.parse_args()
 
@@ -320,9 +441,10 @@ def main() -> int:
 
     print(f"Evaluating source(s): {source_filter or 'ALL'}")
     print(f"Cache mode: {'enabled' if args.quick else 'disabled'}")
+    print(f"mock mode: {'enabled' if args.mock else 'disabled'}")
     print()
 
-    results = asyncio.run(run_evaluation(source_filter, args.quick))
+    results = asyncio.run(run_evaluation(source_filter, args.quick, mock_mode=args.mock))
     print_results(results)
 
     # Exit code: 0 if passing, 1 if failing

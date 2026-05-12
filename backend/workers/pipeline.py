@@ -17,7 +17,6 @@ from typing import Any
 from celery import Celery
 from celery.utils.log import get_task_logger
 from celery.signals import task_failure, task_retry
-from celery.schedules import crontab
 
 from backend.shared.config import settings
 
@@ -149,29 +148,24 @@ def collect_and_publish(self) -> dict[str, Any]:
     """
     async def _run() -> dict[str, Any]:
         from backend.shared.stream import redis_stream
-        from backend.shared.deduper import PostDeduplicator
         from backend.ingestion.orchestrator import IngestionOrchestrator
-        from backend.ingestion.collectors import get_collectors
 
         await redis_stream.connect()
 
         # ── Load active user profile for adaptive collection ─────────────────
         profile_mode    = "b2b_sales"
         include_keywords: list[str] = []
-        exclude_keywords: list[str] = []
 
         try:
             from backend.shared.db import get_db_session
             from backend.shared.repository import ProfileRepo
-            from backend.services.personalization import (
-                QueryGenerator, passes_keyword_filter
-            )
+            from backend.services.personalization import QueryGenerator
+            from backend.collectors.reddit import RedditCollector
             async with get_db_session() as session:
                 profile = await ProfileRepo(session).get_active()
                 if profile:
                     profile_mode     = profile.mode or "b2b_sales"
                     include_keywords = profile.include_keywords or []
-                    exclude_keywords = profile.exclude_keywords or []
 
                     qg = QueryGenerator()
                     reddit_queries = qg.generate_reddit_queries(
@@ -185,15 +179,15 @@ def collect_and_publish(self) -> dict[str, Any]:
                         mode=profile_mode,
                         target_industries=profile.target_industries or [],
                     )
-                    reddit_collector = RedditCollector(
+                    _ = RedditCollector(
                         subreddits=reddit_subs,
                         search_queries=reddit_queries,
                     )
                 else:
-                    reddit_collector = RedditCollector()
+                    _ = RedditCollector()
         except Exception as exc:
             logger.warning("Profile load failed, using defaults: %s", exc)
-            reddit_collector = RedditCollector()
+            _ = RedditCollector()
 
         # Use the ingestion orchestrator for unified collection
         orchestrator = IngestionOrchestrator()
@@ -380,11 +374,12 @@ def compute_daily_metrics(self) -> dict[str, Any]:
 
     Metrics:
         - leads_extracted: Count of new leads today
-        - email_validity_rate: % of valid emails
+        - email_validity_rate: % of valid emails (from feedback)
         - field_precision: Eval score against ground truth
         - dedup_rate: Duplicate collision rate
         - gemini_tokens_used: Token consumption
         - budget_remaining: Remaining GCP budget
+        - sources_active: Number of sources with data today
     """
     async def _run() -> dict[str, Any]:
         from datetime import date
@@ -399,25 +394,58 @@ def compute_daily_metrics(self) -> dict[str, Any]:
         # Token usage
         budget_status = await get_budget_status()
 
-        # Lead counts
-        leads_collected = int(r.get(f"leads:collected:{today}") or 0)
-        leads_deduped = int(r.get(f"leads:deduped:{today}") or 0)
+        # Lead counts from Redis
+        leads_collected = int(await r.get(f"leads:collected:{today}") or 0)
+        leads_qualified = int(await r.get(f"leads:qualified:{today}") or 0)
+        leads_deduped = int(await r.get(f"leads:deduped:{today}") or 0)
+
+        # Source activity — count sources with data today
+        from backend.workers.source_metrics import SOURCES, get_qualification_rate
+        active_sources = 0
+        source_rates = {}
+        for s in SOURCES:
+            rate_info = await get_qualification_rate(s, days=1)
+            source_rates[s] = rate_info["rate_pct"]
+            if rate_info["total"] > 0:
+                active_sources += 1
+
+        # Email validity from feedback repository
+        email_validity_rate = None
+        try:
+            from backend.shared.db import get_db_session
+            from backend.shared.repository import FeedbackRepo
+            async with get_db_session() as session:
+                fb_repo = FeedbackRepo(session)
+                stats = await fb_repo.get_recent_stats(days=7)
+                email_validity_rate = stats.get("email_validity_pct")
+        except Exception:
+            pass
 
         metrics = {
             "date": today,
             "leads_collected": leads_collected,
+            "leads_qualified": leads_qualified,
             "leads_deduped": leads_deduped,
-            "tokens_used": budget_status["used"],
-            "tokens_remaining": budget_status["remaining"],
-            "budget_percent_used": budget_status["percent_used"],
+            "dedup_rate": round(leads_deduped / max(leads_collected, 1), 3),
+            "qualification_rate": round(leads_qualified / max(leads_collected, 1), 3),
+            "email_validity_rate": email_validity_rate,
+            "sources_active": active_sources,
+            "source_rates": source_rates,
+            "tokens_used": budget_status["daily"]["used"],
+            "tokens_remaining": budget_status["daily"]["remaining"],
+            "budget_percent_used": budget_status["daily"]["pct_used"],
+            "estimated_daily_cost_usd": budget_status["estimated_daily_cost_usd"],
+            "trial_budget_remaining_usd": budget_status["trial_budget_remaining_usd"],
         }
 
         # Quality freeze check
-        # TODO: Get email_validity_rate from LeadEvent aggregation
-        # if email_validity_rate < 0.60:
-        #     metrics["quality_freeze"] = True
-        #     logger.error("QUALITY_FREEZE_TRIGGERED", validity=email_validity_rate)
-        #     # TODO: Pause all actors
+        if email_validity_rate is not None and email_validity_rate < 0.60:
+            metrics["quality_freeze"] = True
+            logger.error("QUALITY_FREEZE_TRIGGERED", validity=email_validity_rate)
+
+        # Persist to Redis with 90-day TTL
+        await r.hset(f"daily_metrics:{today}", mapping={k: str(v) for k, v in metrics.items()})
+        await r.expire(f"daily_metrics:{today}", 86400 * 90)
 
         logger.info("daily_metrics", **metrics)
 

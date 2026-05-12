@@ -26,8 +26,17 @@ out/
 *.njsproj
 *.sln
 *.sw?
+# Environment variables
 .env
+*.env
 
+.env.local
+.env.production
+.env.staging
+backend/.env
+infra/.env
+
+# Vercel
 .vercel
 
 # Python
@@ -46,4 +55,3 @@ ROADMAP.md
 
 # Virtual environments
 venv/
-.env

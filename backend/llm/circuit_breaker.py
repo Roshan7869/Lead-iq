@@ -44,6 +44,6 @@ def record_failure(name: str = "gemini", threshold: int = 5, recovery_timeout: i
     failures = int(_r.hget(key, "failures") or 0) + 1
     _r.hset(key, mapping={"failures": failures, "last_failure": time.time(), "recovery_timeout": recovery_timeout})
     if failures >= threshold:
-        _r.hset(key, "state", "open")
+        _r.hset(key, mapping={"state": CircuitState.OPEN.value, "last_failure": time.time()})
         _r.expire(key, recovery_timeout * 3)
         logger.error("circuit_opened", name=name, failures=failures)

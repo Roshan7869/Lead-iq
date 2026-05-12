@@ -7,7 +7,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 # ── Shared ────────────────────────────────────────────────────────────────────
@@ -43,8 +43,7 @@ class LeadOut(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class LeadListResponse(BaseModel):
@@ -107,8 +106,7 @@ class FeedbackResponse(BaseModel):
     label: str | None
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # ── User Profile ──────────────────────────────────────────────────────────────
@@ -170,8 +168,7 @@ class UserProfileResponse(BaseModel):
     feedback_adjustments: dict[str, Any]
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # ── Personalised Lead ─────────────────────────────────────────────────────────

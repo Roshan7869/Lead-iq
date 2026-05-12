@@ -1,0 +1,85 @@
+# LeadIQ Monitoring Stack
+# Spin up alongside the main stack to collect metrics and visualise pipeline health.
+#
+# Usage:
+#   docker compose -f infra/docker-compose.monitoring.yml up -d
+#
+# Services run on a dedicated monitoring-net network and expose:
+#   - Prometheus:  http://localhost:9090
+#   - Grafana:     http://localhost:3001  (admin / admin)
+#   - Node Exporter: http://localhost:9100
+
+name: leadiq-monitoring
+
+services:
+  # ── Prometheus ──────────────────────────────────────────────────────────
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    container_name: leadiq-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=30d"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+      - "--web.enable-lifecycle"
+    depends_on:
+      - node-exporter
+    networks:
+      - monitoring-net
+
+  # ── Grafana ─────────────────────────────────────────────────────────────
+  grafana:
+    image: grafana/grafana:11.0.0
+    container_name: leadiq-grafana
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:?Set GRAFANA_PASSWORD before starting monitoring stack}
+      GF_INSTALL_PLUGINS: grafana-piechart-panel
+      GF_AUTH_ANONYMOUS_ENABLED: "${GRAFANA_ANONYMOUS:-false}"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana_dashboard.json:/etc/grafana/provisioning/dashboards/leadiq.json:ro
+    depends_on:
+      - prometheus
+    networks:
+      - monitoring-net
+
+  # ── Node Exporter ───────────────────────────────────────────────────────
+  node-exporter:
+    image: prom/node-exporter:v1.8.0
+    container_name: leadiq-node-exporter
+    restart: unless-stopped
+    ports:
+      - "9100:9100"
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.sysfs=/host/sys"
+      - "--path.rootfs=/host/root"
+      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/host/root:ro
+    networks:
+      - monitoring-net
+
+networks:
+  monitoring-net:
+    name: leadiq-monitoring-net
+    driver: bridge
+
+volumes:
+  prometheus_data:
+    name: leadiq-prometheus-data
+  grafana_data:
+    name: leadiq-grafana-data

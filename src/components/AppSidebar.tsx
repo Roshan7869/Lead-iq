@@ -13,6 +13,9 @@ import {
   ChevronRight,
   Settings2,
   LogOut,
+  Shield,
+  DollarSign,
+  Briefcase,
 } from 'lucide-react';
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
@@ -32,6 +35,9 @@ const navItems = [
   { title: 'Demand Miner', url: '/demand-miner', icon: Search },
   { title: 'Command Center', url: '/command-center', icon: Terminal },
   { title: 'ROI Tracker', url: '/roi-tracker', icon: TrendingUp },
+  { title: 'Schemes', url: '/schemes', icon: Shield },
+  { title: 'Funding', url: '/funding', icon: DollarSign },
+  { title: 'Jobs', url: '/jobs', icon: Briefcase },
 ];
 
 export function AppSidebar() {

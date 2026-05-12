@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import asyncio
 import structlog
-from typing import Any
 
 from backend.api.schemas import TriggerResponse
 from backend.collectors.reddit import RedditCollector

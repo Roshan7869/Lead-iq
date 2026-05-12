@@ -10,7 +10,7 @@ from datetime import datetime
 from typing import Any
 
 from sqlalchemy import Column, DateTime, Float, String, Text
-from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
+from sqlalchemy.dialects.postgresql import ARRAY, UUID
 
 from backend.shared.db import Base
 

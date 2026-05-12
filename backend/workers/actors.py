@@ -14,9 +14,7 @@ celery_app. We use a module-level lazy import pattern.
 from __future__ import annotations
 
 import asyncio
-import os
 import structlog
-from datetime import datetime
 from typing import Any
 
 from backend.shared.config import settings
@@ -91,7 +89,7 @@ def _register_actor_tasks(celery_app_instance):
             return asyncio.run(_run())
         except Exception as exc:
             logger.error("collect_github_failed", username=username, error=str(exc))
-            raise self.retry(exc=exc)
+            raise self.retry(exc=exc) from exc
 
     @celery_app_instance.task(
         bind=True,
@@ -124,7 +122,7 @@ def _register_actor_tasks(celery_app_instance):
             return asyncio.run(_run())
         except Exception as exc:
             logger.error("search_github_india_failed", error=str(exc))
-            raise self.retry(exc=exc)
+            raise self.retry(exc=exc) from exc
 
     @celery_app_instance.task(
         bind=True,
@@ -151,17 +149,10 @@ def _register_actor_tasks(celery_app_instance):
             return asyncio.run(_run())
         except Exception as exc:
             logger.error("monitor_telegram_failed", error=str(exc))
-            raise self.retry(exc=exc)
+            raise self.retry(exc=exc) from exc
 
     # Register the tasks in the task router
     from backend.workers.dlq import TASK_ROUTER
-    from backend.workers.pipeline import (
-        collect_and_publish,
-        run_analysis_consumer,
-        run_scoring_consumer,
-        persist_scored_leads,
-        dedup_lead,
-    )
 
     TASK_ROUTER["actors.collect_github"] = lambda a, k: collect_github_task.apply_async(
         args=a, kwargs=k

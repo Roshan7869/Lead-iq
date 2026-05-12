@@ -1,0 +1,4 @@
+# workers/naukri-actor/requirements.txt
+# Core dependencies (backend package provides config, etc.)
+crawlee[playwright]>=1.6.0
+redis>=4.6.0

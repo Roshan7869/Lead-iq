@@ -1,0 +1,4 @@
+# workers/internshala-actor/requirements.txt
+# Crawlee provides the BeautifulSoupCrawler framework + built-in HTTP client
+crawlee[beautifulsoup]>=1.6.0
+redis>=4.6.0

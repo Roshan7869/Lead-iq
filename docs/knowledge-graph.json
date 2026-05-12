@@ -1,0 +1,248 @@
+{
+  "meta": {
+    "project": "LeadIQ",
+    "generated_at": "2026-05-12T02:50:00Z",
+    "description": "LeadIQ B2B lead extraction + intelligence platform knowledge graph"
+  },
+  "entities": [
+    {
+      "id": "fastapi-app",
+      "type": "application",
+      "name": "FastAPI Backend",
+      "path": "backend/main.py",
+      "description": "Entrypoint with lifespan: DB verify, Redis stream + velocity tracker connect. Registers 17 routers + rate limiter.",
+      "connects_to": ["routes", "services", "models", "infra-redis", "infra-postgres"]
+    },
+    {
+      "id": "routes",
+      "type": "module_group",
+      "name": "API Routes (17)",
+      "path": "backend/api/routes/",
+      "entities": [
+        {"id": "route-auth", "name": "auth", "path": "backend/api/routes/auth.py"},
+        {"id": "route-admin", "name": "admin", "path": "backend/api/routes/admin.py"},
+        {"id": "route-profile", "name": "profile", "path": "backend/api/routes/profile.py"},
+        {"id": "route-stats", "name": "stats", "path": "backend/api/routes/stats.py"},
+        {"id": "route-leads", "name": "leads", "path": "backend/api/routes/leads.py"},
+        {"id": "route-mcp", "name": "mcp", "path": "backend/api/routes/mcp.py"},
+        {"id": "route-live-feed", "name": "live_feed", "path": "backend/api/routes/live_feed.py"},
+        {"id": "route-crawler", "name": "crawler", "path": "backend/api/routes/crawler.py"},
+        {"id": "route-funding", "name": "funding", "path": "backend/api/routes/funding.py"},
+        {"id": "route-jobs", "name": "jobs", "path": "backend/api/routes/jobs.py"},
+        {"id": "route-government", "name": "government", "path": "backend/api/routes/government.py"},
+        {"id": "route-scoring", "name": "scoring", "path": "backend/api/routes/scoring.py"},
+        {"id": "route-outreach", "name": "outreach", "path": "backend/api/routes/outreach.py"},
+        {"id": "route-schemes", "name": "schemes", "path": "backend/api/routes/schemes.py"},
+        {"id": "route-validate", "name": "validate", "path": "backend/api/routes/validate.py"},
+        {"id": "route-nlp", "name": "nlp", "path": "backend/api/routes/nlp.py"},
+        {"id": "route-ml", "name": "ml", "path": "backend/api/routes/ml.py"}
+      ]
+    },
+    {
+      "id": "services",
+      "type": "module_group",
+      "name": "Business Logic Services (16+)",
+      "path": "backend/services/",
+      "entities": [
+        {"id": "svc-confidence", "name": "confidence.py", "description": "compute_confidence() — canonical formula, eval-gated"},
+        {"id": "svc-dedup", "name": "dedup_service.py", "description": "3-tier dedup: exact → fuzzy → pgvector"},
+        {"id": "svc-icp", "name": "icp_service.py", "description": "ICP matching service"},
+        {"id": "svc-icp-scorer", "name": "icp_scorer.py", "description": "Logistic regression ICP scorer"},
+        {"id": "svc-pipeline", "name": "pipeline_service.py", "description": "Lead pipeline state machine"},
+        {"id": "svc-velocity", "name": "velocity.py", "description": "Redis-backed velocity tracker"},
+        {"id": "svc-waterfall", "name": "waterfall_enrichment.py", "description": "Multi-source enrichment waterfall"},
+        {"id": "svc-personalization", "name": "personalization.py", "description": "Outreach message generation"},
+        {"id": "svc-intent", "name": "intent_monitor.py", "description": "Intent signal detection"},
+        {"id": "svc-feedback", "name": "feedback_loop.py", "description": "LeadEvent flywheel"},
+        {"id": "svc-temporal", "name": "temporal_decay.py", "description": "Intent-specific half-lives"},
+        {"id": "svc-outreach-rag", "name": "outreach_rag.py", "description": "RAG-based outreach personalization"},
+        {"id": "svc-rag-chunker", "name": "rag_chunker.py", "description": "RAG chunking"},
+        {"id": "svc-rag-embedder", "name": "rag_embedder.py", "description": "RAG embedding generation"},
+        {"id": "svc-rag-indexer", "name": "rag_indexer.py", "description": "RAG vector index"},
+        {"id": "svc-rag-retriever", "name": "rag_retriever.py", "description": "RAG context retrieval"},
+        {"id": "svc-anomaly", "name": "anomaly_detector.py", "description": "Outlier detection"},
+        {"id": "svc-crawler-orch", "name": "crawler_orchestrator.py", "description": "Multi-source crawler dispatch"},
+        {"id": "svc-crawlers", "name": "crawlers/", "description": "funding_crawler, govt_schemes_crawler, jobs_crawler"}
+      ]
+    },
+    {
+      "id": "models",
+      "type": "module_group",
+      "name": "SQLAlchemy ORM Models (12)",
+      "entities": [
+        {"id": "model-post", "name": "Post", "table": "posts", "description": "Raw scraped content. source, external_id, content_hash (SHA-256), raw_meta (JSONB)."},
+        {"id": "model-lead", "name": "Lead", "table": "leads", "description": "Scored demand signal. embedding (Vector 768), confidence, intent, urgency, scores, stage, outreach_draft, india_signals (ARRAY)."},
+        {"id": "model-feedback", "name": "Feedback", "table": "feedback", "description": "Human rating 1-5. lead_id FK, label, reviewer."},
+        {"id": "model-userprofile", "name": "UserProfile", "table": "user_profiles", "description": "ICP / operation mode settings."},
+        {"id": "model-quota", "name": "QuotaUsage", "table": "quota_usage", "description": "Daily Gemini token usage."},
+        {"id": "model-company-ctx", "name": "CompanyContext", "table": "company_context", "description": "RAG chunk embeddings (Vector 384)."},
+        {"id": "model-govscheme", "name": "GovScheme", "table": "gov_schemes", "description": "Government scheme details."},
+        {"id": "model-funding", "name": "FundingEvent", "table": "funding_events", "description": "Company funding rounds."},
+        {"id": "model-jobsignal", "name": "JobSignal", "table": "job_signals", "description": "Job posting signals."},
+        {"id": "model-leadevent", "name": "LeadEvent", "table": "lead_events", "description": "User action audit log. 7 event types."},
+        {"id": "model-leaddlq", "name": "LeadDLQ", "table": "lead_dlq", "description": "Dead letter queue records."},
+        {"id": "model-icp", "name": "ICP", "table": "icps", "description": "Ideal Customer Profile. embedding (Vector 768)."}
+      ]
+    },
+    {
+      "id": "collectors",
+      "type": "module_group",
+      "name": "Collectors (18 implemented / 24 files)",
+      "path": "backend/collectors/",
+      "entities": [
+        {"id": "col-github", "name": "GitHub", "status": "active", "auth": "GITHUB_TOKEN", "method": "API"},
+        {"id": "col-hn", "name": "Hacker News", "status": "active", "auth": "none", "method": "HTTP"},
+        {"id": "col-producthunt", "name": "ProductHunt", "status": "active", "auth": "none", "method": "API"},
+        {"id": "col-reddit", "name": "Reddit", "status": "active", "auth": "REDDIT_CLIENT_ID/SECRET", "method": "PRAW"},
+        {"id": "col-stackoverflow", "name": "StackOverflow", "status": "active", "auth": "none", "method": "HTTP"},
+        {"id": "col-twitter", "name": "Twitter", "status": "active", "auth": "TWITTER_BEARER_TOKEN", "method": "API"},
+        {"id": "col-rss", "name": "RSS", "status": "active", "auth": "none", "method": "feedparser"},
+        {"id": "col-telegram", "name": "Telegram", "status": "active", "auth": "TELEGRAM_API_ID/HASH", "method": "API+scrape"},
+        {"id": "col-dpiit", "name": "DPIIT v2", "status": "active", "auth": "none", "method": "Playwright"},
+        {"id": "col-mca21", "name": "MCA21 v2", "status": "active", "auth": "none", "method": "Playwright"},
+        {"id": "col-govt-schemes", "name": "Government Schemes", "status": "active", "auth": "none", "method": "HTTP"},
+        {"id": "col-msme", "name": "MSME", "status": "active", "auth": "none", "method": "HTTP"},
+        {"id": "col-naukri", "name": "Naukri", "status": "active", "auth": "none", "method": "Playwright"},
+        {"id": "col-internshala", "name": "Internshala", "status": "active", "auth": "none", "method": "HTTP+HTML"},
+        {"id": "col-indeed", "name": "Indeed", "status": "stub", "auth": "TBD", "method": "TBD"},
+        {"id": "col-linkedin-jobs", "name": "LinkedIn Jobs", "status": "stub", "auth": "TBD", "method": "TBD"}
+      ]
+    },
+    {
+      "id": "workers",
+      "type": "module_group",
+      "name": "Celery Workers",
+      "path": "backend/workers/",
+      "entities": [
+        {"id": "worker-analyzer", "name": "analyzer.py", "description": "7-stage waterfall analysis (30K bytes)"},
+        {"id": "worker-scorer", "name": "scorer.py", "description": "Deterministic lead scoring"},
+        {"id": "worker-pipeline", "name": "pipeline.py", "description": "End-to-end orchestration"},
+        {"id": "worker-actors", "name": "actors.py", "description": "GitHub, Telegram, DPIIT, MCA21, Tracxn actors"},
+        {"id": "worker-dlq", "name": "dlq.py", "description": "Dead Letter Queue capture + retry"},
+        {"id": "worker-outreach", "name": "outreach_scorer.py", "description": "Outreach draft quality scoring"},
+        {"id": "worker-stages", "name": "pipeline_stages.py", "description": "Stage-specific processing"},
+        {"id": "worker-metrics", "name": "source_metrics.py", "description": "Per-source qualification tracking"},
+        {"id": "worker-rate-limiter", "name": "rate_limiter.py", "description": "Token budget rate limiter"}
+      ]
+    },
+    {
+      "id": "llm",
+      "type": "module_group",
+      "name": "LLM Layer",
+      "path": "backend/llm/",
+      "entities": [
+        {"id": "llm-gemini", "name": "gemini_service.py", "description": "extract_lead(), get_embedding() — sole LLM interface"},
+        {"id": "llm-prompts", "name": "SOURCE_PROMPTS.py", "description": "8 source-specific extraction templates"},
+        {"id": "llm-schemas", "name": "schemas.py", "description": "AnalysisResult Pydantic v2 schema"},
+        {"id": "llm-cost", "name": "cost_guard.py", "description": "2M daily / 83K hourly budget enforcement"},
+        {"id": "llm-cb", "name": "circuit_breaker.py", "description": "Cascading failure prevention"},
+        {"id": "llm-versions", "name": "prompt_versioning.py", "description": "A/B test framework for prompts"},
+        {"id": "llm-provider", "name": "provider.py", "description": "Abstract LLM provider interface"},
+        {"id": "llm-ollama", "name": "ollama_provider.py", "description": "Local Ollama fallback"},
+        {"id": "llm-heuristic", "name": "heuristic_provider.py", "description": "Rule-based fallback"},
+        {"id": "llm-fallback", "name": "fallback_chain.py", "description": "Provider cascade: Gemini → Ollama → Heuristic"}
+      ]
+    },
+    {
+      "id": "streams",
+      "type": "module_group",
+      "name": "Redis Streams",
+      "description": "Event bus connecting pipeline stages",
+      "entities": [
+        {"id": "stream-collected", "name": "lead:collected", "producer": "Ingestion", "consumer": "analyzer.py"},
+        {"id": "stream-analyzed", "name": "lead:analyzed", "producer": "analyzer.py", "consumer": "scorer.py"},
+        {"id": "stream-scored", "name": "lead:scored", "producer": "scorer.py", "consumer": "pipeline.py"},
+        {"id": "stream-ranked", "name": "lead:ranked", "producer": "pipeline.py", "consumer": "personalization"},
+        {"id": "stream-outreach", "name": "lead:outreach", "producer": "personalization", "consumer": "CRM"},
+        {"id": "stream-crm", "name": "lead:crm_update", "producer": "Outreach", "consumer": "External CRM"},
+        {"id": "stream-logs", "name": "system:logs", "producer": "All services", "consumer": "Monitoring"},
+        {"id": "stream-events", "name": "leadiq:events:*", "producer": "events/emitter.py", "consumer": "Subscribers"}
+      ]
+    },
+    {
+      "id": "frontend",
+      "type": "application",
+      "name": "Next.js Frontend",
+      "path": "src/",
+      "description": "Next.js 15 App Router, shadcn/ui, TanStack React Query, Framer Motion",
+      "entities": [
+        {"id": "fe-pages", "name": "Pages", "routes": ["/", "/pipeline", "/demand-miner", "/command-center", "/roi-tracker", "/funding", "/jobs", "/schemes", "/login"]},
+        {"id": "fe-api", "name": "Next.js API Routes", "routes": ["/api/health", "/api/leads", "/api/lead/[id]", "/api/run-miner", "/api/run-ai", "/api/mcp", "/api/profile", "/api/auth"]},
+        {"id": "fe-views", "name": "View Components", "components": ["Overview", "DemandMiner", "CommandCenter", "Pipeline", "ROITracker", "Funding", "JobSignals", "Schemes"]},
+        {"id": "fe-hooks", "name": "Hooks", "hooks": ["use-auth", "use-leads", "use-profile", "use-mobile", "use-toast", "use-live-feed"]},
+        {"id": "fe-mw", "name": "middleware.ts", "description": "Auth cookie gate + sliding-window rate limiter"}
+      ]
+    },
+    {
+      "id": "infra",
+      "type": "module_group",
+      "name": "Infrastructure",
+      "entities": [
+        {"id": "infra-redis", "name": "Redis", "description": "Streams, cache, velocity tracker, Celery broker"},
+        {"id": "infra-postgres", "name": "PostgreSQL", "description": "Primary DB, asyncpg, pgvector HNSW indexes"},
+        {"id": "infra-docker", "name": "Docker Compose", "path": "infra/docker-compose.yml"},
+        {"id": "infra-vercel", "name": "Vercel", "description": "Frontend deployment"},
+        {"id": "infra-railway", "name": "Railway", "description": "Backend deployment"}
+      ]
+    },
+    {
+      "id": "eval",
+      "type": "module",
+      "name": "Eval Framework",
+      "path": "eval/",
+      "description": "ground_truth.json + run_eval.py. Measures field_precision >75%. RUN AFTER EVERY PROMPT CHANGE.",
+      "modes": {"mock": "deterministic, no API key needed", "quick": "cached, no API calls", "full": "calls Gemini API"}
+    }
+  ],
+  "relationships": [
+    {"source": "route-leads", "target": "svc-dedup", "type": "delegates_to", "description": "Lead routes call dedup_service for duplicate detection"},
+    {"source": "route-leads", "target": "svc-pipeline", "type": "delegates_to", "description": "Lead routes call pipeline_service for stage transitions"},
+    {"source": "route-jobs", "target": "svc-crawler-orch", "type": "delegates_to", "description": "Jobs routes trigger crawler orchestration"},
+    {"source": "svc-dedup", "target": "model-lead", "type": "persists_to", "description": "Dedup merges/existing lead records"},
+    {"source": "svc-feedback", "target": "model-leadevent", "type": "persists_to", "description": "Feedback loop logs events to LeadEvent table"},
+    {"source": "svc-icp-scorer", "target": "model-icp", "type": "reads_from", "description": "ICP scorer loads profiles from ICP table"},
+    {"source": "worker-analyzer", "target": "llm-gemini", "type": "calls", "description": "Analyzer calls extract_lead() for LLM extraction"},
+    {"source": "llm-gemini", "target": "llm-cost", "type": "checks_before", "description": "Cost guard check before every Gemini call"},
+    {"source": "llm-gemini", "target": "llm-prompts", "type": "reads", "description": "Selects source-specific prompt template"},
+    {"source": "llm-gemini", "target": "llm-fallback", "type": "falls_back_to", "description": "Fallback chain on Gemini failure"},
+    {"source": "llm-gemini", "target": "llm-cb", "type": "guarded_by", "description": "Circuit breaker prevents cascading failures"},
+    {"source": "worker-analyzer", "target": "stream-analyzed", "type": "publishes_to", "description": "After analysis, publishes result to stream"},
+    {"source": "worker-scorer", "target": "stream-scored", "type": "publishes_to", "description": "After scoring, publishes result to stream"},
+    {"source": "worker-pipeline", "target": "stream-ranked", "type": "publishes_to", "description": "After ranking, publishes result to stream"},
+    {"source": "stream-collected", "target": "worker-analyzer", "type": "triggers", "description": "New collected lead triggers analysis"},
+    {"source": "stream-analyzed", "target": "worker-scorer", "type": "triggers", "description": "Analyzed lead triggers scoring"},
+    {"source": "stream-scored", "target": "worker-pipeline", "type": "triggers", "description": "Scored lead triggers pipeline"},
+    {"source": "svc-personalization", "target": "svc-outreach-rag", "type": "uses", "description": "Personalization uses RAG for context-aware outreach"},
+    {"source": "svc-outreach-rag", "target": "model-company-ctx", "type": "queries", "description": "RAG retriever queries company context embeddings"},
+    {"source": "collectors", "target": "model-post", "type": "persists_to", "description": "Collectors save raw posts to Post table"},
+    {"source": "model-post", "target": "model-lead", "type": "maps_to", "description": "Post has one-to-one relationship with Lead"},
+    {"source": "model-lead", "target": "model-feedback", "type": "has_many", "description": "Lead has many Feedback records"},
+    {"source": "model-lead", "target": "model-leadevent", "type": "has_many", "description": "Lead has many LeadEvent audit records"},
+    {"source": "fe-hooks", "target": "fe-api", "type": "calls", "description": "React Query hooks call Next.js API routes"},
+    {"source": "fe-api", "target": "routes", "type": "proxies_to", "description": "Next.js API routes proxy to FastAPI backend"},
+    {"source": "fastapi-app", "target": "infra-postgres", "type": "connects_to", "description": "FastAPI connects to PostgreSQL via asyncpg"},
+    {"source": "fastapi-app", "target": "infra-redis", "type": "connects_to", "description": "FastAPI connects to Redis for streams"},
+    {"source": "infra-postgres", "target": "models", "type": "stores", "description": "PostgreSQL stores all ORM model data"},
+    {"source": "infra-redis", "target": "streams", "type": "hosts", "description": "Redis hosts all stream channels"},
+    {"source": "svc-confidence", "target": "eval", "type": "validated_by", "description": "Confidence formula must not change without eval pass"},
+    {"source": "llm-prompts", "target": "eval", "type": "validated_by", "description": "Prompt changes require eval run"}
+  ],
+  "data_flow": {
+    "pipeline": [
+      {"step": 1, "stage": "COLLECT", "component": "Collectors", "action": "Scrape 24 sources → RawPost", "output": "Post table"},
+      {"step": 2, "stage": "DEDUP", "component": "dedup_service.py", "action": "3-tier dedup (exact → fuzzy → vector)", "output": "Deduplicated posts"},
+      {"step": 3, "stage": "EXTRACT", "component": "llm/gemini_service.py", "action": "extract_lead() with source-specific prompt", "output": "Lead record"},
+      {"step": 4, "stage": "ANALYZE", "component": "workers/analyzer.py", "action": "7-stage waterfall analysis", "output": "lead:analyzed stream"},
+      {"step": 5, "stage": "SCORE", "component": "workers/scorer.py", "action": "composite score = 0.40×intent + 0.30×icp_fit + 0.20×velocity + 0.10×network", "output": "lead:scored stream"},
+      {"step": 6, "stage": "RANK", "component": "services/*", "action": "temporal_decay + icp_scorer + feedback_loop + velocity_bonus", "output": "lead:ranked stream"},
+      {"step": 7, "stage": "OUTREACH", "component": "personalization.py + outreach_rag.py", "action": "Generate outreach draft, quality gate ≥7.0/10", "output": "lead:outreach stream"},
+      {"step": 8, "stage": "CRM", "component": "pipeline_service.py", "action": "Push to external CRM", "output": "lead:crm_update stream"}
+    ],
+    "feedback_loop": [
+      {"step": 1, "component": "User", "action": "approve/reject/edit lead"},
+      {"step": 2, "component": "LeadEvent model", "action": "Log event to lead_events table"},
+      {"step": 3, "component": "feedback_loop.py", "action": "Adjust lead scores based on feedback"},
+      {"step": 4, "component": "icp_scorer.py", "action": "Retrain logistic regression weights"}
+    ]
+  }
+}

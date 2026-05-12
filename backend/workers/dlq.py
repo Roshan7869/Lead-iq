@@ -31,9 +31,7 @@ Usage:
 """
 from __future__ import annotations
 
-import asyncio
 import json
-import logging
 from datetime import datetime, timedelta
 from typing import Any
 
@@ -232,7 +230,7 @@ class DLQWorker:
                 continue
 
             # Route to correct task
-            task_router_entry = TASK_ROUTER.get(task_name)
+            task_router_entry = self.TASK_ROUTER.get(task_name)
             if task_router_entry is None:
                 record.stage = LeadDLQStage.failed_permanent
                 record.resolved_at = now
@@ -408,3 +406,65 @@ class DLQWorker:
             .limit(limit)
         )
         return result.scalars().all()
+
+    async def cleanup_resolved(self, older_than_days: int = 30) -> dict[str, int]:
+        """
+        Auto-cleanup: hard-delete resolved/failed_permanent records older than N days.
+
+        Returns {"deleted": N}
+        """
+        from datetime import timedelta
+        cutoff = datetime.utcnow() - timedelta(days=older_than_days)
+
+        result = await self.db.execute(
+            select(LeadDLQ).where(
+                LeadDLQ.stage.in_([LeadDLQStage.resolved, LeadDLQStage.failed_permanent]),
+                LeadDLQ.created_at <= cutoff,
+            )
+        )
+        stale = result.scalars().all()
+
+        deleted = 0
+        for record in stale:
+            await self.db.delete(record)
+            deleted += 1
+
+        if deleted > 0:
+            await self.db.commit()
+            self._logger.info("dlq_cleanup_complete", deleted=deleted, cutoff=str(cutoff))
+
+        return {"deleted": deleted}
+
+    async def get_error_categories(self) -> dict[str, int]:
+        """Categorize failures by error type for monitoring."""
+        from sqlalchemy import func
+
+        result = await self.db.execute(
+            select(LeadDLQ.failure_type, func.count(LeadDLQ.id))
+            .where(LeadDLQ.stage != LeadDLQStage.resolved)
+            .group_by(LeadDLQ.failure_type)
+            .order_by(func.count(LeadDLQ.id).desc())
+        )
+        return {row[0]: row[1] for row in result.all()}
+
+    async def get_burst_stats(self, window_minutes: int = 60) -> dict[str, Any]:
+        """Detect failure bursts — high failure rate in a time window."""
+        from datetime import timedelta
+        from sqlalchemy import func
+
+        cutoff = datetime.utcnow() - timedelta(minutes=window_minutes)
+        result = await self.db.execute(
+            select(func.count(LeadDLQ.id)).where(LeadDLQ.created_at >= cutoff)
+        )
+        recent_count = result.scalar_one() or 0
+
+        burst_threshold = 10  # More than 10 failures in N minutes = burst
+        is_burst = recent_count > burst_threshold
+
+        return {
+            "window_minutes": window_minutes,
+            "recent_failures": recent_count,
+            "burst_threshold": burst_threshold,
+            "is_burst": is_burst,
+            "severity": "critical" if is_burst else "normal",
+        }

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.dialects.postgresql import ARRAY
 
 
 # revision identifiers, used by Alembic.
@@ -46,40 +47,30 @@ def upgrade() -> None:
     op.execute("COMMIT")
     op.execute('''
         CREATE INDEX CONCURRENTLY IF NOT EXISTS ix_lead_stage_created
-        ON leads (stage, created_at DESC)
+        ON leads (stage, created_at)
     ''')
     op.execute("COMMIT")
     op.execute('''
         CREATE INDEX CONCURRENTLY IF NOT EXISTS ix_lead_icp_stage
-        ON leads (icp_fit_score DESC, stage)
+        ON leads (icp_fit_score, stage)
         WHERE icp_fit_score IS NOT NULL
     ''')
     op.execute("COMMIT")
     op.execute('''
         CREATE INDEX CONCURRENTLY IF NOT EXISTS ix_lead_post_created
-        ON leads (post_id, created_at DESC)
+        ON leads (post_id, created_at)
     ''')
     op.execute("COMMIT")
     op.execute('''
         CREATE INDEX CONCURRENTLY IF NOT EXISTS ix_lead_final_score
-        ON leads (final_score DESC)
+        ON leads (final_score)
         WHERE final_score IS NOT NULL
     ''')
 
     # CHECK constraints
-    op.execute('''
-        DO $$
-        BEGIN
-            IF NOT EXISTS (
-                SELECT 1 FROM pg_constraint
-                WHERE conname = 'ck_lead_confidence_range'
-            ) THEN
-                ALTER TABLE leads
-                ADD CONSTRAINT ck_lead_confidence_range
-                CHECK (confidence >= 0.0 AND confidence <= 1.0);
-            END IF;
-        END $$
-    ''')
+    op.add_column("leads", sa.Column("pain_point", sa.Text(), nullable=True))
+    op.add_column("leads", sa.Column("raw_excerpt", sa.Text(), nullable=True))
+    op.add_column("leads", sa.Column("india_signals", sa.ARRAY(sa.String()), nullable=True, server_default="{}"))
     op.execute('''
         DO $$
         BEGIN

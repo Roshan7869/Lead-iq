@@ -183,7 +183,6 @@ async def find_vector_match(
     try:
         # Use pgvector cosine distance
         # Note: Requires pgvector extension installed
-        from pgvector.sqlalchemy import Vector
 
         # Find similar leads by embedding
         result = await session.execute(

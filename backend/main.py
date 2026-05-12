@@ -4,12 +4,10 @@ B2B Intelligence Pipeline — Full stack: collectors → analyzer → scorer →
 """
 from __future__ import annotations
 
-import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
@@ -21,7 +19,9 @@ from backend.services.velocity import velocity_tracker
 from backend.shared.db import engine
 from sqlalchemy import text
 from backend.api import health
-from backend.api.routes import leads, stats, admin, profile, auth, mcp
+from backend.api.routes import leads, stats, admin, profile, auth, mcp, live_feed
+from backend.api.routes import jobs, government, scoring, outreach, schemes, validate, nlp, ml
+from backend.api.routes import crawler, funding, models
 from backend.api.mcp_server import mcp_app
 
 # ── Bootstrap logging + Sentry before anything else ──────────────────────────
@@ -35,6 +35,7 @@ limiter = Limiter(key_func=get_remote_address, default_limits=[settings.RATE_LIM
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("leadiq_startup", version="2.0.0")
+    settings.validate_production_requirements()
     # Startup: verify DB connection first (Hussein Nasser - fail fast)
     try:
         async with engine.connect() as conn:
@@ -113,6 +114,18 @@ app.include_router(stats.router)
 app.include_router(admin.router)
 app.include_router(profile.router)
 app.include_router(mcp.router)
+app.include_router(live_feed.router)
+app.include_router(jobs.router)
+app.include_router(government.router)
+app.include_router(scoring.router)
+app.include_router(outreach.router)
+app.include_router(schemes.router)
+app.include_router(validate.router)
+app.include_router(nlp.router)
+app.include_router(ml.router)
+app.include_router(crawler.router)
+app.include_router(funding.router)
+app.include_router(models.router)
 
 # ── MCP server (Streamable HTTP at /mcp) ─────────────────────────────────
 app.mount("/mcp", mcp_app)

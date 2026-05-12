@@ -16,20 +16,19 @@ Usage:
 from __future__ import annotations
 
 import structlog
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 from typing import Any
 
 from backend.shared.config import settings
 from backend.shared.stream import redis_stream
 from backend.llm.gemini_service import extract_lead
-from backend.llm.cost_guard import check_budget
 
 logger = structlog.get_logger()
 
 
 def _now_iso() -> str:
     """Get current UTC timestamp as ISO string."""
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 # ── Enrichment Tier Configuration ────────────────────────────────────────────────
