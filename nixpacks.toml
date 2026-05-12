@@ -1,8 +1,11 @@
 [phases.setup]
-nixPkgs = ["python311"]
+nixPkgs = ["python312", "python312Packages.pip", "python312Packages.setuptools"]
+
 [phases.install]
-commands = ["pip install -r backend/requirements.txt", "pip install scrapling[fetchers]"]
-[phases.build]
-commands = ["echo 'No build step required'"]
+commands = [
+  "cd backend && pip install -r requirements.txt --no-cache-dir",
+  "pip install scrapling[fetchers] --no-cache-dir",
+]
+
 [start]
-cmd = "uvicorn backend.main:app --host 0.0.0.0 --port $PORT"
+cmd = "cd backend && uvicorn backend.main:app --host 0.0.0.0 --port $PORT"
